@@ -210,11 +210,14 @@ public:
   Interval<T, 1> operator*=(const Interval<T, 1>& interval)
   {
     auto list = {lower_*interval.lower(),
-                 upper_*interval.upper(),
+                 lower_*interval.upper(),
                  upper_*interval.lower(),
                  upper_*interval.upper()};
 
-    return Interval<T, 1>(std::min(list), std::max(list));
+    lower_ = std::min(list);
+    upper_ = std::max(list);
+
+    return *this;
   }
 
   Interval<T, 1> operator&(const Interval<T, 1>& interval)
