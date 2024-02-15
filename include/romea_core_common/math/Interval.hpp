@@ -49,7 +49,11 @@ public:
   : lower_(lower),
     upper_(upper)
   {
-    assert((lower_.array() <= upper_.array()).all());
+    if((lower_.array() <= upper_.array()).all())
+    {
+      lower_.array() = T::Constant(std::nan(""));
+      upper_.array() = T::Constant(std::nan(""));
+    };
   }
 
 public:
@@ -79,9 +83,30 @@ public:
     upper_.array() = upper_.array().max(interval.upper().array());
   }
 
+  Interval<Scalar, DIM> operator|(const Interval<Scalar, DIM> & interval)
+  {
+    return Interval<Scalar, DIM>({
+      lower_.array().min(interval.lower().array()),
+      upper_.array().max(interval.upper().array())
+      });
+  }
+
+  Interval<Scalar, DIM> operator&(const Interval<Scalar, DIM> & interval)
+  {
+    return Interval<Scalar, DIM>({
+      lower_.array().max(interval.upper().array()),
+      upper_.array().min(interval.lower().array())
+      });
+  }
+
   bool inside(const T & val)const
   {
     return (val.array() >= lower_.array()).all() && (val.array() <= upper_.array()).all();
+  }
+
+  bool is_empty() const
+  {
+    return (lower_.array().isNaN()||upper_.array().isNaN()).any();
   }
 
 private:
@@ -154,7 +179,11 @@ public:
   : lower_(lower),
     upper_(upper)
   {
-    assert(lower_ <= upper_);
+    if (lower > upper)
+    {
+      lower_ = T(std::nan(""));
+      upper_ = T(std::nan(""));
+    }
   }
 
 public:
@@ -166,6 +195,38 @@ public:
   const T & upper() const
   {
     return upper_;
+  }
+
+  Interval<T, 1> operator+(const Interval<T, 1>& interval)
+  {
+    return Interval<T, 1>(lower_ + interval.lower(), upper_ + interval.upper());
+  }
+
+  Interval<T, 1> operator-(const Interval<T, 1>& interval)
+  {
+    return Interval<T, 1>(lower_ - interval.lower(), upper_ - interval.upper());
+  }
+
+  Interval<T, 1> operator*=(const Interval<T, 1>& interval)
+  {
+    auto list = {lower_*interval.lower(),
+                 upper_*interval.upper(),
+                 upper_*interval.lower(),
+                 upper_*interval.upper()};
+
+    return Interval<T, 1>(std::min(list), std::max(list));
+  }
+
+  Interval<T, 1> operator&(const Interval<T, 1>& interval)
+  {
+    return Interval<T, 1>(std::max(lower_, interval.lower()),
+                          std::min(upper_, interval.upper()));
+  }
+
+  Interval<T, 1> operator|(const Interval<T, 1>& interval)
+  {
+    return Interval<T, 1>(std::min(lower_, interval.lower()),
+                          std::max(upper_, interval.upper()));
   }
 
   T width()const
@@ -186,6 +247,12 @@ public:
   bool inside(const T & val)const
   {
     return val >= lower_ && val <= upper_;
+  }
+
+  template <size_t Index>
+  auto get() const {
+      if constexpr (Index == 0) return lower_;
+      if constexpr (Index == 1) return upper_;
   }
 
 private:
@@ -264,5 +331,23 @@ Interval2D<Scalar> to2D(const Interval3D<Scalar> & interval3D)
 
 }  // namespace core
 }  // namespace romea
+
+namespace std
+{
+  template<typename T>
+  struct tuple_size<::romea::core::Interval<T, 1>> 
+      : integral_constant<size_t, 2> {};
+
+  template<typename T>
+  struct tuple_element<0, ::romea::core::Interval<T, 1>> { 
+      using type = T;
+  };
+
+  template<typename T>
+  struct tuple_element<1, ::romea::core::Interval<T, 1>> {
+      using type = T;
+  };
+}
+
 
 #endif  // ROMEA_CORE_COMMON__MATH__INTERVAL_HPP_
