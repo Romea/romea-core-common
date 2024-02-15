@@ -54,6 +54,7 @@ void computeHistogram(const DataContainer& input,
   // Implementation taken from PCL Library
   //resizing the vector to nbins to store histogram;
   bins_data.resize(nbins,2);
+  bins_data.setZero();
 
   ScalarOut bin_size = (high_range - low_range) / (nbins);
   if (bin_size == 0) bin_size = 1.0;
@@ -68,7 +69,6 @@ void computeHistogram(const DataContainer& input,
     {
       auto index = (size_t) (std::round ((input[i] - low_range) / bin_size)); // was initialy std::floor
       if (index == (size_t) nbins) index =  nbins - 1; //including right boundary
-      //std::cout << bins_data(index,0) << " " << bins_data(index,1) <<std::endl;
       bins_data(index,1)++;
     }
   }
