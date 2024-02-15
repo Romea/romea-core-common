@@ -49,7 +49,7 @@ public:
   : lower_(lower),
     upper_(upper)
   {
-    if((lower_.array() <= upper_.array()).all())
+    if((lower_.array() > upper_.array()).all())
     {
       lower_.array() = T::Constant(std::nan(""));
       upper_.array() = T::Constant(std::nan(""));
