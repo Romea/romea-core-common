@@ -335,11 +335,11 @@ Interval2D<Scalar> to2D(const Interval3D<Scalar> & interval3D)
 namespace std
 {
   template<typename T>
-  struct tuple_size<::romea::core::Interval<T, 1>> 
+  struct tuple_size<::romea::core::Interval<T, 1>>
       : integral_constant<size_t, 2> {};
 
   template<typename T>
-  struct tuple_element<0, ::romea::core::Interval<T, 1>> { 
+  struct tuple_element<0, ::romea::core::Interval<T, 1>> {
       using type = T;
   };
 
