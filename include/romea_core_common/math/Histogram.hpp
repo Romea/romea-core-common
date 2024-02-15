@@ -67,7 +67,7 @@ void computeHistogram(const DataContainer& input,
   {
     if (std::isfinite (input[i]))
     {
-      auto index = (size_t) (std::round ((input[i] - low_range) / bin_size)); // was initialy std::floor
+      auto index = (size_t) (std::floor((input[i] - low_range) / bin_size));
       if (index == (size_t) nbins) index =  nbins - 1; //including right boundary
       bins_data(index,1)++;
     }
