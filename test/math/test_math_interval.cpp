@@ -188,6 +188,92 @@ TEST(TestInterval, testInterval2DiInclude)
 }
 
 //-----------------------------------------------------------------------------
+TEST(TestInterval, testIntervalAddOperator1D)
+{
+  double lower1 = 3.2;
+  double upper1 = 8.5;
+  double lower2 = -7.3;
+  double upper2 = -2.4;
+
+  romea::core::Interval1D<double> interval(lower1, upper1);
+  romea::core::Interval1D<double> interval2(lower2, upper2);
+  auto ret = interval + interval2;
+
+  EXPECT_DOUBLE_EQ(ret.lower(), -4.1);
+  EXPECT_DOUBLE_EQ(ret.upper(), 6.1);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestInterval, testIntervalMinusOperator1D)
+{
+  double lower1 = 3.2;
+  double upper1 = 8.5;
+  double lower2 = -7.3;
+  double upper2 = -2.4;
+
+  romea::core::Interval1D<double> interval(lower1, upper1);
+  romea::core::Interval1D<double> interval2(lower2, upper2);
+  auto ret = interval - interval2;
+
+  EXPECT_DOUBLE_EQ(ret.lower(), 10.5);
+  EXPECT_DOUBLE_EQ(ret.upper(), 10.9);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestInterval, testIntervalTimesEqualOperator1D)
+{
+  double lower1 = 3.2;
+  double upper1 = 8.5;
+  double lower2 = -7.3;
+  double upper2 = -2.4;
+
+  romea::core::Interval1D<double> interval(lower1, upper1);
+  romea::core::Interval1D<double> interval2(lower2, upper2);
+  interval *= interval2;
+
+  EXPECT_DOUBLE_EQ(interval.lower(), -62.05);
+  EXPECT_DOUBLE_EQ(interval.upper(), -7.68);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestInterval, testIntervalIntersectOperator1D)
+{
+  romea::core::Interval1D<double> interval(3.2, 8.5);
+  romea::core::Interval1D<double> interval2(-7.3, -2.4);
+  auto ret = interval & interval2;
+
+  EXPECT_TRUE(std::isnan(ret.lower()));
+  EXPECT_TRUE(std::isnan(ret.upper()));
+
+  romea::core::Interval1D<double> interval3(1.2, 12.4);
+  romea::core::Interval1D<double> interval4(4.7, 78.1);
+  auto ret2 = interval3 & interval4;
+  EXPECT_DOUBLE_EQ(ret2.lower(), 4.7);
+  EXPECT_DOUBLE_EQ(ret2.upper(), 12.4);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestInterval, testIntervalUnionOperator1D)
+{
+  romea::core::Interval1D<double> interval(3.2, 8.5);
+  romea::core::Interval1D<double> interval2(-7.3, -2.4);
+  auto ret = interval | interval2;
+
+  EXPECT_DOUBLE_EQ(ret.lower(), -7.3);
+  EXPECT_DOUBLE_EQ(ret.upper(), 8.5);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestInterval, testIntervalStructuredBinding1D)
+{
+  romea::core::Interval1D<double> interval(3.2, 8.5);
+  auto [a,b] = interval;
+
+  EXPECT_DOUBLE_EQ(a, 3.2);
+  EXPECT_DOUBLE_EQ(b, 8.5);
+}
+
+//-----------------------------------------------------------------------------
 int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
