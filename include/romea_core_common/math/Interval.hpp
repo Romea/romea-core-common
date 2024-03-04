@@ -83,7 +83,7 @@ public:
     upper_.array() = upper_.array().max(interval.upper().array());
   }
 
-  Interval<Scalar, DIM> operator|(const Interval<Scalar, DIM> & interval)
+  Interval<Scalar, DIM> operator|(const Interval<Scalar, DIM> & interval) const
   {
     return Interval<Scalar, DIM>({
       lower_.array().min(interval.lower().array()),
@@ -91,7 +91,7 @@ public:
       });
   }
 
-  Interval<Scalar, DIM> operator&(const Interval<Scalar, DIM> & interval)
+  Interval<Scalar, DIM> operator&(const Interval<Scalar, DIM> & interval) const
   {
     return Interval<Scalar, DIM>({
       lower_.array().max(interval.upper().array()),
@@ -220,13 +220,13 @@ public:
     return *this;
   }
 
-  Interval<T, 1> operator&(const Interval<T, 1>& interval)
+  Interval<T, 1> operator&(const Interval<T, 1>& interval) const
   {
     return Interval<T, 1>(std::max(lower_, interval.lower()),
                           std::min(upper_, interval.upper()));
   }
 
-  Interval<T, 1> operator|(const Interval<T, 1>& interval)
+  Interval<T, 1> operator|(const Interval<T, 1>& interval) const
   {
     return Interval<T, 1>(std::min(lower_, interval.lower()),
                           std::max(upper_, interval.upper()));
