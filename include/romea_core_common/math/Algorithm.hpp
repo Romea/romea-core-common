@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <iostream>
 #include <optional>
+#include <sstream>
 
 namespace romea
 {
@@ -77,6 +78,16 @@ RealType clamp(
   const RealType & maxValue)
 {
   assert(minValue <= maxValue);
+
+  if (std::isnan(value)) {
+    std::stringstream msg;
+    msg << "Cannot clamp Nan value between ";
+    msg << minValue;
+    msg << " and ";
+    msg << maxValue;
+    throw std::runtime_error(msg.str());
+  }
+
   return std::max(minValue, std::min(maxValue, value));
 }
 
