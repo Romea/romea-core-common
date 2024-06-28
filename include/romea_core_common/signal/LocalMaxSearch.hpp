@@ -24,7 +24,7 @@ namespace core
 {
 
 template<typename Container>
-std::vector<Interval<double, 1>> getMaxs(const Container& input, double bump_percentage, double min_value);
+std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double bump_percentage, double min_value);
 
 template<typename Container>
 int findBackwardBound(const Container& input, size_t i, double bump_percentage);
@@ -34,7 +34,7 @@ int findForwardBound(const Container& input, size_t i, double bump_percentage);
 
 
 template<typename Container>
-std::vector<Interval<double, 1>> getMaxs(const Container& input, double bump_percentage, double min_value)
+std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double bump_percentage, double min_value)
 {
   std::vector<Interval<double, 1>> max_bounds;
 
