@@ -24,7 +24,7 @@ namespace core
 {
 
 template<typename Container>
-std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double bump_percentage, double min_value);
+std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double bump_height, double min_value);
 
 template<typename Container>
 int findBackwardBound(const Container& input, size_t i, double bump_percentage);
@@ -34,7 +34,7 @@ int findForwardBound(const Container& input, size_t i, double bump_percentage);
 
 
 template<typename Container>
-std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double bump_percentage, double min_value)
+std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double bump_height, double min_value)
 {
   std::vector<Interval<double, 1>> max_bounds;
 
@@ -42,7 +42,7 @@ std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double 
   if (input[i] >= min_value && input[i+1] < input[i])
   {
     int idx_min = 0;
-    int idx_max = findForwardBound(input, i, bump_percentage);
+    int idx_max = findForwardBound(input, i, bump_height);
 
     if (idx_max>-1)
     {
@@ -60,8 +60,8 @@ std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double 
     {
       // Case input[i] constant : "<" not "<="
       // Found local max. : if current data higher than previous & next one
-      int idx_min = findBackwardBound(input, i, bump_percentage);
-      int idx_max = findForwardBound(input, i, bump_percentage);
+      int idx_min = findBackwardBound(input, i, bump_height);
+      int idx_max = findForwardBound(input, i, bump_height);
 
       // if left bound is found & right bound isn't found due to signal crop => we have found a max at the beginning of signal
       if (idx_min>-1 && idx_max==-1)
@@ -79,7 +79,7 @@ std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double 
   i = input.size()-1;
   if (input[i] >= min_value && input[i-1] < input[i])
   {
-    int idx_min = findBackwardBound(input, i, bump_percentage);
+    int idx_min = findBackwardBound(input, i, bump_height);
     int idx_max = input.size()-1;
 
     if (idx_min>-1)
@@ -92,28 +92,28 @@ std::vector<Interval<double, 1>> getIntervalMaxs(const Container& input, double 
 }
 
 template<typename Container>
-int findBackwardBound(const Container& input, size_t i, double bump_percentage)
+int findBackwardBound(const Container& input, size_t i, double bump_height)
 {
-  double minimum_bump_size = bump_percentage*input[i];
-  double maximum_bump_size = bump_percentage*input[i];
+  double minimum_bump_size = bump_height;
+  double maximum_bump_size = bump_height;
 
-  for (size_t backward_idx=0; backward_idx<i+1; backward_idx++)
+  for (size_t backward_idx=1; backward_idx<i+1; backward_idx++)
   {
-    if (input[i-backward_idx] < input[i]-minimum_bump_size)
+    if (input[i-backward_idx] < input[i]-bump_height)
       return int(i-backward_idx);
-    else if (input[i-backward_idx] > input[i]+maximum_bump_size)
+    else if (input[i-backward_idx] > input[i]+bump_height)
       return -2; // Rising edge towards backward indexes
   }
   return -1; // Backward bound not found
 }
 
 template<typename Container>
-int findForwardBound(const Container& input, size_t i, double bump_percentage)
+int findForwardBound(const Container& input, size_t i, double bump_height)
 {
-  double minimum_bump_size = bump_percentage*input[i];
-  double maximum_bump_size = bump_percentage*input[i];
+  double minimum_bump_size = bump_height;
+  double maximum_bump_size = bump_height;
 
-  for (size_t forward_idx=0; forward_idx<input.size()-i; forward_idx++)
+  for (size_t forward_idx=1; forward_idx<input.size()-i; forward_idx++)
   {
     if (input[i+forward_idx] < input[i]-minimum_bump_size)
       return int(i+forward_idx);
