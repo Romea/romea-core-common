@@ -1,6 +1,6 @@
-# ROMEA Core Common Library
+# romea_core_common #
 
-This library is a versatile collection of tools designed to support the ROMEA robotic ecosystem. It offers a range of utilities for various functionalities:
+This project is a C++ library that provides versatile collection of tools designed to support the ROMEA robotic ecosystem. It offers a range of utilities for various functionalities:
 
 - **Geodesy Conversions:**
   Tools for accurate transformations between different geodetic coordinate systems, ensuring precise location data.
@@ -44,8 +44,8 @@ This project is released under the Apache License 2.0. See the LICENSE file for 
 
 ## **Authors**
 
-The Romea Core Common library was developed by **Jean Laneurit** in the context of various research projects carried out at INRAE.
+The romea_core_common library was developed by **Jean Laneurit** in the context of various research projects carried out at INRAE.
 
 ## **Contact**
 
-If you have any questions or comments about Romea Core Common library, please contact **[Jean Laneurit](mailto:jean.laneurit@inrae.fr)** 
+If you have any questions or comments about romea_core_common library, please contact **[Jean Laneurit](mailto:jean.laneurit@inrae.fr)** 
