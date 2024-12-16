@@ -44,7 +44,7 @@ public:
     const Vector & residualsWithDiscardedValue,
     const size_t & numberOfDiscardedData);
 
-  const Vector & getWeights()const;
+  const Vector & getWeights()const { return weights_; }
 
 private:
   void allocate_(const int & dataSize);
