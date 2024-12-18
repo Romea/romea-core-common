@@ -15,6 +15,7 @@
 
 // std
 #include <vector>
+#include <iostream>
 
 // local
 #include "romea_core_common/containers/grid/GridIndexMapping.hpp"
@@ -29,7 +30,8 @@ template<typename Scalar, size_t DIM>
 GridIndexMapping<Scalar, DIM>::GridIndexMapping()
 : cellResolution_(0.),
   numberOfCellsAlongAxes_(),
-  flooredMinimalPositionAlongAxes_(),
+  minimalValuesAlongAxes_(),
+  maximalValuesAlongAxes_(),
   cellCentersPositionAlongAxes_(DIM)
 {
 }
@@ -41,27 +43,21 @@ GridIndexMapping<Scalar, DIM>::GridIndexMapping(
   const Scalar & cellResolution)
 : cellResolution_(cellResolution),
   numberOfCellsAlongAxes_(),
-  flooredMinimalPositionAlongAxes_(),
+  minimalValuesAlongAxes_(),
+  maximalValuesAlongAxes_(),
   cellCentersPositionAlongAxes_(DIM)
 {
-  flooredMinimalPositionAlongAxes_.array() = cellResolution_ * (
-    floor((extrimities.lower().array() / cellResolution_)) - 0.5);
+  minimalValuesAlongAxes_.array() = cellResolution_ *
+    (round((extrimities.lower().array() / cellResolution_)) - 0.5);
 
-  numberOfCellsAlongAxes_.array() = (ceil(extrimities.upper().array() / cellResolution_) -
-    floor(extrimities.lower().array() / cellResolution_) + 1).template cast<size_t>();
+  maximalValuesAlongAxes_.array() = cellResolution_ *
+    (round((extrimities.upper().array() / cellResolution_)) + 0.5);
 
+  numberOfCellsAlongAxes_.array() = (round(extrimities.upper().array() / cellResolution_) -
+    round(extrimities.lower().array() / cellResolution_) + 1).template cast<size_t>();
 
-  for (size_t dim = 0; dim < DIM; dim++) {
-    const size_t & numberOfCellsAlongAxis = numberOfCellsAlongAxes_[dim];
-    const Scalar & flooredMinimalPositionAlongAxis = flooredMinimalPositionAlongAxes_[dim];
-    std::vector<Scalar> & cellCentersPositionAlongAxis = cellCentersPositionAlongAxes_[dim];
+  computeCellCentersPosition_();
 
-    cellCentersPositionAlongAxis.resize(numberOfCellsAlongAxis);
-    for (size_t n = 0; n < numberOfCellsAlongAxis; ++n) {
-      cellCentersPositionAlongAxis[n] =
-        flooredMinimalPositionAlongAxis + (n + Scalar(0.5)) * cellResolution_;
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -72,6 +68,55 @@ GridIndexMapping<Scalar, DIM>::GridIndexMapping(
 : GridIndexMapping(IntervalType(PointType::Constant(-maximalRange),
     PointType::Constant(maximalRange)), cellResolution)
 {
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
+GridIndexMapping<Scalar, DIM>::GridIndexMapping(
+  const PointType & center,
+  const Scalar & maximalRange,
+  const Scalar & cellResolution)
+: GridIndexMapping(
+    IntervalType(
+      center + PointType::Constant(-maximalRange),
+      center + PointType::Constant(maximalRange)), cellResolution)
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
+void GridIndexMapping<Scalar, DIM>::computeCellCentersPosition_()
+{
+  for (size_t dim = 0; dim < DIM; dim++) {
+    const size_t & numberOfCellsAlongAxis = numberOfCellsAlongAxes_[dim];
+    const Scalar & minimalValueAlongAxis = minimalValuesAlongAxes_[dim];
+    std::vector<Scalar> & cellCentersAlongAxis = cellCentersPositionAlongAxes_[dim];
+
+    cellCentersAlongAxis.resize(numberOfCellsAlongAxis);
+    for (size_t n = 0; n < numberOfCellsAlongAxis; ++n) {
+      cellCentersAlongAxis[n] = minimalValueAlongAxis + (n + Scalar(0.5)) * cellResolution_;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
+typename GridIndexMapping<Scalar, DIM>::CellIndexesOffset
+GridIndexMapping<Scalar, DIM>::updateCenter(const PointType & center)
+{
+  PointType currentRoundedCenter = computeCellCenterPosition(numberOfCellsAlongAxes_ / 2);
+  PointType newRoundedCenter = cellResolution_ * (round((center.array() / cellResolution_)));
+
+  minimalValuesAlongAxes_ = newRoundedCenter -
+    numberOfCellsAlongAxes_.template cast<Scalar>() / 2 * cellResolution_;
+  maximalValuesAlongAxes_ = newRoundedCenter +
+    numberOfCellsAlongAxes_.template cast<Scalar>() / 2 * cellResolution_;
+
+  computeCellCentersPosition_();
+
+  return ((newRoundedCenter - currentRoundedCenter) / cellResolution_).template cast<int>();
 }
 
 //-----------------------------------------------------------------------------
@@ -94,7 +139,7 @@ template<typename Scalar, size_t DIM>
 typename GridIndexMapping<Scalar, DIM>::CellIndexes
 GridIndexMapping<Scalar, DIM>::computeCellIndexes(const PointType & point)const
 {
-  return ((point - flooredMinimalPositionAlongAxes_) / cellResolution_).template cast<size_t>();
+  return ((point - minimalValuesAlongAxes_) / cellResolution_).template cast<size_t>();
 }
 
 //-----------------------------------------------------------------------------

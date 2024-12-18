@@ -155,8 +155,9 @@ void WrappableGrid<T, DIM>::translate(
           this->buffer_[computeCellLinearIndex_(cellIndexes)] = emptyValue;
         }
       }
-      indexOffsetsAlongAxes_[0] = (numberOfCellsAlongXAxis + indexOffsetAlongXAxis) %
-        numberOfCellsAlongXAxis;
+      indexOffsetsAlongAxes_[0] =
+        (indexOffsetsAlongAxes_[0] + (numberOfCellsAlongXAxis + indexOffsetAlongXAxis) %
+        numberOfCellsAlongXAxis);
     }
 
     // translation along Y
@@ -176,7 +177,8 @@ void WrappableGrid<T, DIM>::translate(
         }
       }
 
-      indexOffsetsAlongAxes_[1] = (numberOfCellsAlongYAxis + indexOffsetAlongYAxis) %
+      indexOffsetsAlongAxes_[1] =
+        (indexOffsetsAlongAxes_[1] + (numberOfCellsAlongYAxis + indexOffsetAlongYAxis)) %
         numberOfCellsAlongYAxis;
     }
   } else {
@@ -213,7 +215,7 @@ void WrappableGrid<T, DIM>::translate(
           }
         }
       }
-      indexOffsetsAlongAxes_[0] = (numberOfCellsAlongXAxis + indexOffsetAlongXAxis) %
+      indexOffsetsAlongAxes_[0] += (numberOfCellsAlongXAxis + indexOffsetAlongXAxis) %
         numberOfCellsAlongXAxis;
     }
 
@@ -236,7 +238,7 @@ void WrappableGrid<T, DIM>::translate(
           }
         }
       }
-      indexOffsetsAlongAxes_[1] = (numberOfCellsAlongYAxis + indexOffsetAlongYAxis) %
+      indexOffsetsAlongAxes_[1] += (numberOfCellsAlongYAxis + indexOffsetAlongYAxis) %
         numberOfCellsAlongYAxis;
     }
 
@@ -262,7 +264,7 @@ void WrappableGrid<T, DIM>::translate(
           }
         }
       }
-      indexOffsetsAlongAxes_[2] = (numberOfCellsAlongZAxis + indexOffsetAlongZAxis) %
+      indexOffsetsAlongAxes_[2] += (numberOfCellsAlongZAxis + indexOffsetAlongZAxis) %
         numberOfCellsAlongZAxis;
     }
   }
