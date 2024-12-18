@@ -59,7 +59,7 @@ PointSetPreconditioner<PointType>::compute(const PointSet<PointType> & points)
     pointSetMax_.array() = pointSetMax_.array().max(point.array());
     pointSetMean_ += point;
   }
-  pointSetMean_ /= int(points.size());
+  pointSetMean_ /= static_cast<int>(points.size());
 
 
   // Scale min, max and mean

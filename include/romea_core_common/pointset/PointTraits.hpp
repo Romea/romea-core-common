@@ -82,7 +82,21 @@ struct PointTraits<HomogeneousCoordinates3f>
 };
 
 template<>
+struct PointTraits<Eigen::Vector4f>
+{
+  static constexpr int DIM = 3;
+  static constexpr int SIZE = 4;
+};
+
+template<>
 struct PointTraits<HomogeneousCoordinates3d>
+{
+  static constexpr int DIM = 3;
+  static constexpr int SIZE = 4;
+};
+
+template<>
+struct PointTraits<Eigen::Vector4d>
 {
   static constexpr int DIM = 3;
   static constexpr int SIZE = 4;
