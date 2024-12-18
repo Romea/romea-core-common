@@ -38,11 +38,18 @@ public:
   using IntervalType = Interval<Scalar, DIM>;
   using PointType = Eigen::Matrix<Scalar, DIM, 1>;
   using CellIndexes = Eigen::Matrix<size_t, DIM, 1>;
+  using CellIndexesOffset = Eigen::Matrix<int, DIM, 1>;
 
 public:
   GridIndexMapping();
 
+
   GridIndexMapping(
+    const Scalar & maximalRange,
+    const Scalar & cellResolution);
+
+  GridIndexMapping(
+    const PointType & center,
     const Scalar & maximalRange,
     const Scalar & cellResolution);
 
@@ -57,15 +64,21 @@ public:
 
   const std::vector<Scalar> & getCellCentersPositionAlong(const size_t & axisDIM) const;
 
+  CellIndexesOffset updateCenter(const PointType & center);
+
 public:
   CellIndexes computeCellIndexes(const PointType & point) const;
 
   PointType computeCellCenterPosition(const CellIndexes & cellIndexes) const;
 
-private:
+protected:
+  void computeCellCentersPosition_();
+
+protected:
   Scalar cellResolution_;
   CellIndexes numberOfCellsAlongAxes_;
-  PointType flooredMinimalPositionAlongAxes_;
+  PointType minimalValuesAlongAxes_;
+  PointType maximalValuesAlongAxes_;
   std::vector<std::vector<Scalar>> cellCentersPositionAlongAxes_;
 
 public:
@@ -80,4 +93,4 @@ using GridIndexMapping3d = GridIndexMapping<double, 3>;
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_CONTAINERS_GRID_GRIDINDEXMAPPING_HPP_
+#endif  // ROMEA_CORE_COMMON__CONTAINERS__GRID__GRIDINDEXMAPPING_HPP_
