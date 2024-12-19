@@ -55,6 +55,8 @@ add_library(${PROJECT_NAME} SHARED
   src/pointset/algorithms/PreconditionedPointSet.cpp
   src/pointset/algorithms/NormalAndCurvatureEstimation.cpp
   src/pointset/KdTree.cpp
+  src/pointset/kdtree/KdMapNode.cpp
+  src/pointset/KdMap.cpp
   src/signal/Noise.cpp
   src/signal/FirstOrderButterworth.cpp
   src/time/Timer.cpp
