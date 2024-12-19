@@ -71,4 +71,4 @@ protected:
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_REGRESSION_LEASTSQUARES_NLSE_HPP_
+#endif  // ROMEA_CORE_COMMON__REGRESSION__LEASTSQUARES__NLSE_HPP_

@@ -29,7 +29,6 @@ struct Neighbor
   size_t pointIndex;
   ScalarType pointSquaredDistance;
   Neighbor(const size_t & pointIndex, const ScalarType & pointSquareDistance);
-
 };
 
 

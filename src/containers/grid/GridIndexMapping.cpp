@@ -57,7 +57,6 @@ GridIndexMapping<Scalar, DIM>::GridIndexMapping(
     round(extrimities.lower().array() / cellResolution_) + 1).template cast<size_t>();
 
   computeCellCentersPosition_();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -81,7 +80,6 @@ GridIndexMapping<Scalar, DIM>::GridIndexMapping(
       center + PointType::Constant(-maximalRange),
       center + PointType::Constant(maximalRange)), cellResolution)
 {
-
 }
 
 

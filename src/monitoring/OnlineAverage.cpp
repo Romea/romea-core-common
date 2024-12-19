@@ -79,7 +79,7 @@ double OnlineAverage::getAverage()const
 void OnlineAverage::update(const double & value)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  long long int integerValue = static_cast<long long int>(value * multiplier_);
+  int64_t integerValue = static_cast<int64_t>(value * multiplier_);
 
   sumOfData_ += integerValue;
   if (data_.size() != windowSize_) {
@@ -88,7 +88,7 @@ void OnlineAverage::update(const double & value)
     sumOfData_ -= data_[index_];
     data_[index_] = integerValue;
   }
-  average_ = sumOfData_ / (double(multiplier_) * data_.size());
+  average_ = sumOfData_ / (static_cast<double>(multiplier_) * data_.size());
   index_ = (index_ + 1) % windowSize_;
 }
 

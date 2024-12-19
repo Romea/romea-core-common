@@ -129,7 +129,7 @@ template<typename RealType>
 void
 LeastSquares<RealType>::setEstimateSize(const size_t & estimateSize)
 {
-  estimateSize_ = int(estimateSize);
+  estimateSize_ = static_cast<int>(estimateSize);
   Ac_ = Matrix::Identity(estimateSize_, estimateSize_);
   Bc_ = Vector::Zero(estimateSize_);
   JtJ_ = Matrix::Zero(estimateSize_, estimateSize_);

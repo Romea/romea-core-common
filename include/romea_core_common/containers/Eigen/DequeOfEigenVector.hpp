@@ -37,4 +37,4 @@ using DequeOfEigenVector =
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_CONTAINERS_EIGEN_DEQUEOFEIGENVECTOR_HPP_
+#endif  // ROMEA_CORE_COMMON__CONTAINERS__EIGEN__DEQUEOFEIGENVECTOR_HPP_

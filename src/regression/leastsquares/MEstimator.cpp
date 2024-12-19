@@ -67,10 +67,10 @@ MEstimator<RealType>::computeWeights(
   const Vector & residuals,
   const size_t & numberOfDiscardedData)
 {
-  assert(int(numberOfDiscardedData) <= residuals.rows());
+  assert(static_cast<int>(numberOfDiscardedData) <= residuals.rows());
 
   allocate_(static_cast<int>(residuals.rows()));
-  int numberOfAvailableData = dataSize_ - int(numberOfDiscardedData);
+  int numberOfAvailableData = dataSize_ - static_cast<int>(numberOfDiscardedData);
 
   // Compute median
   sortedVector_.head(dataSize_).noalias() = residuals;
@@ -94,8 +94,9 @@ MEstimator<RealType>::computeWeights(
 
   // Apply weighting only when ratio inliers/outliers are up to 80 percent
   int numberOfInliers =
-    (weights_.array() < ones_.head(dataSize_).array()).sum() - int(numberOfDiscardedData);
-  return numberOfInliers / RealType(numberOfAvailableData);
+    (weights_.array() <
+    ones_.head(dataSize_).array()).sum() - static_cast<int>(numberOfDiscardedData);
+  return numberOfInliers / static_cast<RealType>(numberOfAvailableData);
 }
 
 template class MEstimator<float>;

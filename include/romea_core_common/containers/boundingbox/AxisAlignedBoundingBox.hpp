@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef ROMEA_CORE_COMMON__CONTAINERS__BOUNDINGBOX__AXISALIGNEDBOUNDINGBOX_HPP
-#define ROMEA_CORE_COMMON__CONTAINERS__BOUNDINGBOX__AXISALIGNEDBOUNDINGBOX_HPP
+#ifndef ROMEA_CORE_COMMON__CONTAINERS__BOUNDINGBOX__AXISALIGNEDBOUNDINGBOX_HPP_
+#define ROMEA_CORE_COMMON__CONTAINERS__BOUNDINGBOX__AXISALIGNEDBOUNDINGBOX_HPP_
 
 #include  "romea_core_common/pointset/PointSet.hpp"
 #include  "romea_core_common/pointset/PointTraits.hpp"
@@ -69,4 +69,4 @@ typedef AxisAlignedBoundingBox<double, 3> AxisAlignedBoundingBox3d;
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON___CONTAINERS___BOUNDINGBOX___AXISALIGNEDBOUNDINGBOX_HPP
+#endif  // ROMEA_CORE_COMMON__CONTAINERS__BOUNDINGBOX__AXISALIGNEDBOUNDINGBOX_HPP_

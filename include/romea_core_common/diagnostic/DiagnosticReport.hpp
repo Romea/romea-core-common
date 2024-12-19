@@ -47,6 +47,9 @@ template<typename T>
 std::string toStringInfoValue(const T & infoValue)
 {
   std::ostringstream os;
+  if constexpr (std::is_same_v<T, bool>) {
+    os << std::boolalpha;
+  }
   os << infoValue;
   return os.str();
 }

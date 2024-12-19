@@ -85,7 +85,6 @@ TEST(TestContainers, testRayCasting2d)
 //-----------------------------------------------------------------------------
 TEST(TestContainers, testRayIterativeCasting2d)
 {
-
   typedef typename romea::core::GridIndexMapping2d::PointType PointType;
   typedef typename romea::core::GridIndexMapping2d::CellIndexes CellIndexes;
 
