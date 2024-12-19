@@ -28,4 +28,4 @@ double convertNoiseDensityToNoiseStd(
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_SIGNAL_NOISE_HPP_
+#endif  // ROMEA_CORE_COMMON__SIGNAL__NOISE_HPP_

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef ROMEA_CORE_COMMON_GEODESY_WGS84COORDINATES_HPP_
-#define ROMEA_CORE_COMMON_GEODESY_WGS84COORDINATES_HPP_
+#ifndef ROMEA_CORE_COMMON__GEODESY__WGS84COORDINATES_HPP_
+#define ROMEA_CORE_COMMON__GEODESY__WGS84COORDINATES_HPP_
 
 #include <ostream>
 
@@ -38,4 +38,4 @@ std::ostream & operator<<(std::ostream & os, const WGS84Coordinates & wgs84Coord
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_GEODESY_WGS84COORDINATES_HPP_
+#endif  // ROMEA_CORE_COMMON__GEODESY__WGS84COORDINATES_HPP_
