@@ -18,6 +18,7 @@
 
 // std
 #include <vector>
+#include <string>
 
 // local
 #include "../test/test_helper.h"

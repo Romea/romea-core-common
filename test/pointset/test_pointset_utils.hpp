@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef POINTSET__TEST_POINTSET_UTILS_HPP_
+#define POINTSET__TEST_POINTSET_UTILS_HPP_
 
 // std
 #include <fstream>
@@ -91,3 +93,5 @@ std::vector<romea::core::Correspondence> fakeCorrespondences(size_t numberOfCorr
 
   return correspondences;
 }
+
+#endif   // POINTSET__TEST_POINTSET_UTILS_HPP_

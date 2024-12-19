@@ -51,8 +51,8 @@ private:
 
   Duration lastPeriod_;
   SharedVariable<Duration> lastDuration_;
-  std::queue<long long int> periods_;
-  long long int periodsSum_;
+  std::queue<int64_t> periods_;
+  int64_t periodsSum_;
   std::atomic<double> rate_;
 };
 

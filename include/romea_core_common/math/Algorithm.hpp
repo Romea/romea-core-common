@@ -17,12 +17,12 @@
 #define ROMEA_CORE_COMMON__MATH__ALGORITHM_HPP_
 
 // std
+#include <optional>
 #include <cmath>
 #include <cassert>
 #include <limits>
 #include <algorithm>
 #include <iostream>
-#include <optional>
 #include <sstream>
 
 namespace romea

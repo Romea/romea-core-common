@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef ROMEA_CORE_COMMON_MONITORING_ONLINEAVERAGE_HPP_
-#define ROMEA_CORE_COMMON_MONITORING_ONLINEAVERAGE_HPP_
+#ifndef ROMEA_CORE_COMMON__MONITORING__ONLINEAVERAGE_HPP_
+#define ROMEA_CORE_COMMON__MONITORING__ONLINEAVERAGE_HPP_
 
 // std
 #include <queue>
@@ -60,12 +60,12 @@ protected:
   int multiplier_;
 
   mutable std::mutex mutex_;
-  std::vector<long long int> data_;
-  long long int sumOfData_;
+  std::vector<int64_t> data_;
+  int64_t sumOfData_;
   double average_;
 };
 
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_MONITORING_ONLINEAVERAGE_HPP_
+#endif  // ROMEA_CORE_COMMON__MONITORING__ONLINEAVERAGE_HPP_

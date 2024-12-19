@@ -44,6 +44,9 @@ private:
   mutable std::mutex mutex_;
 };
 
+template<typename T>
+using ThreadSafeVariable = SharedVariable<T>;
+
 //-----------------------------------------------------------------------------
 template<typename T>
 SharedVariable<T>::SharedVariable()
@@ -56,7 +59,6 @@ template<typename T>
 SharedVariable<T>::SharedVariable(const T & value)
 : value_(value), mutex_()
 {
-
 }
 
 //-----------------------------------------------------------------------------

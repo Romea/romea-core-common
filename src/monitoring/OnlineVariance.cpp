@@ -74,8 +74,8 @@ double OnlineVariance::getVariance()const
 void OnlineVariance::update(const double & value)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  long long int integerValue = static_cast<long long int>(value * multiplier_);
-  long long int squaredIntegerValue = integerValue * integerValue;
+  int64_t integerValue = static_cast<int64_t>(value * multiplier_);
+  int64_t squaredIntegerValue = integerValue * integerValue;
 
   sumOfData_ += integerValue;
   sumOfSquaredData_ += squaredIntegerValue;
@@ -90,8 +90,8 @@ void OnlineVariance::update(const double & value)
     squaredData_[index_] = squaredIntegerValue;
   }
 
-  double average = sumOfData_ / (double(multiplier_) * data_.size());
-  double squaredAverage = (sumOfSquaredData_) / double(squaredMultiplier_);
+  double average = sumOfData_ / (static_cast<double>(multiplier_) * data_.size());
+  double squaredAverage = (sumOfSquaredData_) / static_cast<double>(squaredMultiplier_);
   double variance = (squaredAverage - data_.size() * average * average) / (windowSizeMinusOne_);
   average_ = average;
   variance_ = variance;

@@ -54,14 +54,15 @@ RansacRigidTransformationModel<PointType>::RansacRigidTransformationModel()
 }
 
 
-////-----------------------------------------------------------------------------
-//template <class PointType> void
-//RansacRigidTransformationModel<PointType>::init(const PointSet<PointType> & sourcePoints,
-//                                                const PointSet<PointType> & targetPoints,
-//                                                const PointSet<PointType> & targetNormals,
-//                                                const std::vector<Correspondence> & correspondences,
-//                                                const TransformationMatrixType & guessTransformation)
-//{
+// //-----------------------------------------------------------------------------
+// template <class PointType> void
+// RansacRigidTransformationModel<PointType>::init(
+//   const PointSet<PointType> & sourcePoints,
+//   const PointSet<PointType> & targetPoints,
+//   const PointSet<PointType> & targetNormals,
+//   const std::vector<Correspondence> & correspondences,
+//   const TransformationMatrixType & guessTransformation)
+// {
 
 //  //Create matched point sets
 //  size_t numberOfMatchedPoints =std::begin(correspondences_.size();
@@ -79,7 +80,7 @@ RansacRigidTransformationModel<PointType>::RansacRigidTransformationModel()
 //    correspondences_[n].targetPointIndex=n;
 //  }
 
-//}
+// }
 
 //-----------------------------------------------------------------------------
 template<class PointType>
@@ -235,8 +236,10 @@ bool RansacRigidTransformationModel<PointType>::draw(const double & modelDeviati
     *sourcePoints_, *correspondences_,
     getNumberOfPointsToDrawModel());
 
-  //  for(size_t n=0, N=sampleCorrespondences.size() ; n< N ;++n)
-  //      std::cout << sampleCorrespondences[n].sourcePointIndex << " "<< sampleCorrespondences[n].targetPointIndex <<std::endl;
+  // for (size_t n = 0, N = sampleCorrespondences.size(); n < N; ++n) {
+  //   std::cout << sampleCorrespondences[n].sourcePointIndex << " " <<
+  //         sampleCorrespondences[n].targetPointIndex << std::endl;
+  // }
 
   compute_(
     precondionedSourcePoints_,
@@ -280,7 +283,6 @@ size_t RansacRigidTransformationModel<PointType>::countInliers(const double & mo
     }
   }
 
-
   // Compute root mean square error
   std::unique(
     std::begin(inlierCorrespondences_),
@@ -291,7 +293,7 @@ size_t RansacRigidTransformationModel<PointType>::countInliers(const double & mo
   for (size_t n = 0, N = inlierCorrespondences_.size(); n < N; ++n) {
     rootMeanSquareError += inlierCorrespondences_[n].squareDistanceBetweenPoints;
   }
-  rootMeanSquareError /= double(inlierCorrespondences_.size());
+  rootMeanSquareError /= static_cast<double>(inlierCorrespondences_.size());
   rootMeanSquareError = std::sqrt(rootMeanSquareError);
 
   // Backup inliers correspondences

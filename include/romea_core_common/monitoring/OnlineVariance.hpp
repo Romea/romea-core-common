@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef ROMEA_CORE_COMMON_MONITORING_ONLINEVARIANCE_HPP_
-#define ROMEA_CORE_COMMON_MONITORING_ONLINEVARIANCE_HPP_
+#ifndef ROMEA_CORE_COMMON__MONITORING__ONLINEVARIANCE_HPP_
+#define ROMEA_CORE_COMMON__MONITORING__ONLINEVARIANCE_HPP_
 
 // std
 #include <vector>
@@ -51,12 +51,12 @@ private:
   size_t windowSizeMinusOne_;
   int squaredMultiplier_;
 
-  std::vector<long long int> squaredData_;
-  long long int sumOfSquaredData_;
+  std::vector<int64_t> squaredData_;
+  int64_t sumOfSquaredData_;
   double variance_;
 };
 
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_MONITORING_ONLINEVARIANCE_HPP_
+#endif  // ROMEA_CORE_COMMON__MONITORING__ONLINEVARIANCE_HPP_

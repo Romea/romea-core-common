@@ -16,8 +16,9 @@
 #ifndef ROMEA_CORE_COMMON__CONCURRENCY__SHAREDOPTIONALVARIABLE_HPP_
 #define ROMEA_CORE_COMMON__CONCURRENCY__SHAREDOPTIONALVARIABLE_HPP_
 
-#include <mutex>
+// std
 #include <optional>
+#include <mutex>
 
 namespace romea
 {
@@ -60,13 +61,13 @@ SharedOptionalVariable<T>::SharedOptionalVariable(const T & value)
 {
 }
 
-////-----------------------------------------------------------------------------
+// //-----------------------------------------------------------------------------
 // template <typename T>
 // ProducerConsumerVariable<T> & ProducerConsumerVariable<T>::operator=(const T & value)
-//{
+// {
 //  store(value);
 //  return *this;
-//}
+// }
 
 //-----------------------------------------------------------------------------
 template<typename T>

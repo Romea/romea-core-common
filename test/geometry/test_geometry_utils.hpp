@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef TEST_GEOMETRY_TEST_GEOMETRY_UTILS_HPP
-#define TEST_GEOMETRY_TEST_GEOMETRY_UTILS_HPP
+#ifndef GEOMETRY__TEST_GEOMETRY_UTILS_HPP_
+#define GEOMETRY__TEST_GEOMETRY_UTILS_HPP_
 
 //-----------------------------------------------------------------------------
 template<typename MsgCovType>
@@ -65,4 +65,4 @@ void isSame(
   }
 }
 
-#endif  // TEST_GEOMETRY_TEST_GEOMETRY_UTILS_HPP
+#endif  // GEOMETRY__TEST_GEOMETRY_UTILS_HPP_

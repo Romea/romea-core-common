@@ -40,7 +40,6 @@ TEST(TestMatrix, testPositiveSemiDefiniteMatrix)
   Eigen::Matrix3d badSe2Covariance3 = se2Covariance;
   badSe2Covariance3(0, 0) = -0.1;
   EXPECT_FALSE(romea::core::isPositiveSemiDefiniteMatrix(badSe2Covariance3));
-
 }
 
 //-----------------------------------------------------------------------------

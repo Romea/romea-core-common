@@ -74,7 +74,7 @@ double RateMonitoring::update(const Duration & duration)
   assert(windowSize_ != 0);
 
   lastPeriod_ = duration - lastDuration_.load();
-  long long int lastPeriodInNanoSecond = durationToNanoSecond(lastPeriod_);
+  int64_t lastPeriodInNanoSecond = durationToNanoSecond(lastPeriod_);
 
   periods_.push(lastPeriodInNanoSecond);
   periodsSum_ += lastPeriodInNanoSecond;

@@ -42,9 +42,9 @@ template<class PointType>
 void
 FindRigidTransformationByLeastSquares<PointType>::setPreconditioner(
   const PreconditionedPointSetType &
-                  #ifndef NDEBUG
+#ifndef NDEBUG
   sourcePoints
-                  #endif
+#endif
   , const PreconditionedPointSetType & targetPoints)
 {
   assert(
