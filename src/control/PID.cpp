@@ -27,97 +27,102 @@ namespace romea
 namespace core
 {
 
+//-----------------------------------------------------------------------------
+double PID::Inputs::error() const
+{
+  return setpoint - measurement;
+}
 
 //-----------------------------------------------------------------------------
 PID::PID(const Parameters & parameters)
-: PID(parameters.kp, parameters.ki, parameters.kd,
-    parameters.imin, parameters.imax,
-    parameters.error_epsilon)
-{
-}
-
-//-----------------------------------------------------------------------------
-PID::PID(
-  const double & kp,
-  const double & ki,
-  const double & kd,
-  const double & imin,
-  const double & imax,
-  const double & error_epsilon)
 : dt_(0),
-  kp_(kp),
-  ki_(ki),
-  kd_(kd),
-  imax_(imax),
-  imin_(imin),
-  i_(0),
-  d_(0),
-  error_epsilon_(error_epsilon),
-  previous_error_(std::numeric_limits<double>::quiet_NaN()),
-  previous_error_stamp_()
+  currentInputs_(),
+  previousInputs_(),
+  parameters_(parameters)
 {
+  currentInputs_.setpoint = std::numeric_limits<double>::quiet_NaN();
 }
 
-//-----------------------------------------------------------------------------
-const double & PID::kp() const
-{
-  return kp_;
-}
+// //-----------------------------------------------------------------------------
+// const double & PID::kp() const
+// {
+//   return kp_;
+// }
+
+// //-----------------------------------------------------------------------------
+// const double & PID::ki() const
+// {
+//   return ki_;
+// }
+
+// //-----------------------------------------------------------------------------
+// const double & PID::kd() const
+// {
+//   return kd_;
+// }
 
 //-----------------------------------------------------------------------------
-const double & PID::ki() const
+double PID::compute(const Inputs & inputs)
 {
-  return ki_;
-}
+  previousInputs_ = currentInputs_;
+  currentInputs_ = inputs;
 
-//-----------------------------------------------------------------------------
-const double & PID::kd() const
-{
-  return kd_;
-}
-
-//-----------------------------------------------------------------------------
-double PID::compute(
-  const Duration & stamp,
-  const double & setpoint,
-  const double & measurement)
-{
-  double output = 0;
-  double error = setpoint - measurement;
-
-  if (std::isfinite(previous_error_)) {
-    computeDt_(stamp);
-    updateIntegral_(error);
-    computeDerivative_(error);
-    std::cout << "error" << error << " d " << d_ << " i " << i_ << std::endl;
-    std::cout << "gains " << kp_ << " " << ki_ << "  " << kd_ << std::endl;
-    output = kp_ * setpoint + ki_ * i_ + kd_ * d_;
-  }
-
-  previous_error_ = error;
-  previous_error_stamp_ = stamp;
-  return output;
-}
-
-//-----------------------------------------------------------------------------
-void PID::computeDt_(const Duration & stamp)
-{
-  dt_ = durationToSecond(stamp - previous_error_stamp_);
-}
-//-----------------------------------------------------------------------------
-void PID::computeDerivative_(const double & error)
-{
-  d_ = (error - previous_error_) / dt_;
-}
-
-//-----------------------------------------------------------------------------
-void PID::updateIntegral_(const double & error)
-{
-  if (std::abs(error) > error_epsilon_) {
-    i_ = std::clamp(i_ + error * dt_, imin_, imax_);
+  if (std::isfinite(previousInputs_.setpoint)) {
+    return evaluate_();
   } else {
+    return 0.;
+  }
+}
+
+//-----------------------------------------------------------------------------
+double PID::evaluate_()
+{
+  std::cout << "current inputs" << currentInputs_.setpoint << " " <<
+    currentInputs_.measurement << " " << currentInputs_.error() << std::endl;
+  std::cout << "previous inputs" << previousInputs_.setpoint << " " <<
+    previousInputs_.measurement << " " << previousInputs_.error() << std::endl;
+  std::cout << " gains " << parameters_.kp << " " << parameters_.ki << " " << parameters_.kd <<
+    std::endl;
+  computeDt_();
+  return computeProportionalTerm_() + computeIntegralTerm_() + computeDerivativeTerm_();
+}
+
+//-----------------------------------------------------------------------------
+void PID::computeDt_()
+{
+  dt_ = durationToSecond(currentInputs_.stamp - previousInputs_.stamp);
+  std::cout << " dt_ " << dt_ << std::endl;
+}
+
+//-----------------------------------------------------------------------------
+double PID::computeProportionalTerm_()
+{
+  return parameters_.kp * currentInputs_.error();
+}
+
+//-----------------------------------------------------------------------------
+double PID::computeDerivativeTerm_()
+{
+  return parameters_.kd * (currentInputs_.error() - previousInputs_.error()) / dt_;
+}
+
+//-----------------------------------------------------------------------------
+double PID::computeIntegralTerm_()
+{
+  if (std::abs(currentInputs_.error()) > parameters_.errorEpsilon * dt_) {
+    i_ = std::clamp(i_ + currentInputs_.error() * dt_, parameters_.imin, parameters_.imax);
+  } else {
+    // std::cout << " reset pid " << std::endl;
     i_ = 0;
   }
+  std::cout << " i_ " << i_ << std::endl;
+  return parameters_.ki * i_;
+}
+
+//-----------------------------------------------------------------------------
+void PID::reset()
+{
+  i_ = 0;
 }
 
 }  // namespace core

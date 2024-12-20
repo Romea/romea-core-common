@@ -33,53 +33,44 @@ public:
     double kd;
     double imin;
     double imax;
-    double error_epsilon;
+    double errorEpsilon;
   };
 
-  PID(const Parameters & parameters);
+  struct Inputs
+  {
+    Duration stamp;
+    double setpoint;
+    double measurement;
+    double error() const;
+  };
 
-  PID(
-    const double & kp,
-    const double & ki,
-    const double & kd,
-    const double & imin,
-    const double & imax,
-    const double & error_epsilon);
+public:
+  explicit PID(const Parameters & parameters);
 
-  double compute(
-    const Duration & stamp,
-    const double & setpoint,
-    const double & measurement);
-
-  const double & kp() const;
-  const double & ki() const;
-  const double & kd() const;
+  double compute(const Inputs & inputs);
 
   void reset();
 
-private:
-  void computeDt_(const Duration & stamp);
+protected:
+  void computeDt_();
 
-  void computeDerivative_(const double & error);
+  virtual double evaluate_();
 
-  void updateIntegral_(const double & error);
+  virtual double computeProportionalTerm_();
 
-private:
+  virtual double computeDerivativeTerm_();
+
+  virtual double computeIntegralTerm_();
+
+protected:
   double dt_;
-  double kp_;
-  double ki_;
-  double kd_;
-  double imax_;
-  double imin_;
   double i_;
-  double d_;
-  double error_epsilon_;
-
-  double previous_error_;
-  Duration previous_error_stamp_;
+  Inputs currentInputs_;
+  Inputs previousInputs_;
+  Parameters parameters_;
 };
 
 }  // namespace core
 }  // namespace romea
 
-#endif  // ROMEA_CORE_COMMON_CONTROL_PID_HPP_
+#endif  // ROMEA_CORE_COMMON__CONTROL__PID_HPP_
