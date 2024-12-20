@@ -36,30 +36,13 @@ double PID::Inputs::error() const
 //-----------------------------------------------------------------------------
 PID::PID(const Parameters & parameters)
 : dt_(0),
+  i_(0),
   currentInputs_(),
   previousInputs_(),
   parameters_(parameters)
 {
   currentInputs_.setpoint = std::numeric_limits<double>::quiet_NaN();
 }
-
-// //-----------------------------------------------------------------------------
-// const double & PID::kp() const
-// {
-//   return kp_;
-// }
-
-// //-----------------------------------------------------------------------------
-// const double & PID::ki() const
-// {
-//   return ki_;
-// }
-
-// //-----------------------------------------------------------------------------
-// const double & PID::kd() const
-// {
-//   return kd_;
-// }
 
 //-----------------------------------------------------------------------------
 double PID::compute(const Inputs & inputs)
@@ -77,12 +60,6 @@ double PID::compute(const Inputs & inputs)
 //-----------------------------------------------------------------------------
 double PID::evaluate_()
 {
-  std::cout << "current inputs" << currentInputs_.setpoint << " " <<
-    currentInputs_.measurement << " " << currentInputs_.error() << std::endl;
-  std::cout << "previous inputs" << previousInputs_.setpoint << " " <<
-    previousInputs_.measurement << " " << previousInputs_.error() << std::endl;
-  std::cout << " gains " << parameters_.kp << " " << parameters_.ki << " " << parameters_.kd <<
-    std::endl;
   computeDt_();
   return computeProportionalTerm_() + computeIntegralTerm_() + computeDerivativeTerm_();
 }
@@ -91,7 +68,6 @@ double PID::evaluate_()
 void PID::computeDt_()
 {
   dt_ = durationToSecond(currentInputs_.stamp - previousInputs_.stamp);
-  std::cout << " dt_ " << dt_ << std::endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -112,10 +88,8 @@ double PID::computeIntegralTerm_()
   if (std::abs(currentInputs_.error()) > parameters_.errorEpsilon * dt_) {
     i_ = std::clamp(i_ + currentInputs_.error() * dt_, parameters_.imin, parameters_.imax);
   } else {
-    // std::cout << " reset pid " << std::endl;
     i_ = 0;
   }
-  std::cout << " i_ " << i_ << std::endl;
   return parameters_.ki * i_;
 }
 
