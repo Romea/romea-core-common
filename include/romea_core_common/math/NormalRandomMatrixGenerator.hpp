@@ -45,7 +45,7 @@ public:
 
 public:
   NormalRandomMatrixGenerator()
-  :// engine_(std::random_device{}()),
+  :  // engine_(std::random_device{}()),
     engine_(0),
     mean_(MeanVector::Zero()),
     covariance_(CovarianceMatrix::Zero()),
@@ -65,9 +65,9 @@ public:
   void fill(ContainerBase<Derived> & container)
   {
     std::normal_distribution<Scalar> distribution(0, 1);
-    //    container.unaryExpr([&](double /*dummy*/){return distribution(engine_);});
+    // container.unaryExpr([&](double /*dummy*/){return distribution(engine_);});
 
-    for (int i = 0; i < int(DIM); ++i) {
+    for (int i = 0; i < static_cast<int>(DIM); ++i) {
       for (int j = 0; j < container.cols(); ++j) {
         container(i, j) = distribution(engine_);
       }
@@ -103,7 +103,7 @@ class NormalRandomMatrixGenerator<Scalar, 1, ContainerBase, PRNG>
 {
 public:
   NormalRandomMatrixGenerator()
-  : engine_(std::random_device{}()),
+  : engine_(std::random_device{} ()),
     mean_(0),
     std_(0)
   {
