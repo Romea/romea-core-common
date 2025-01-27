@@ -89,8 +89,8 @@ double PID::compute(
     computeDt_(stamp);
     updateIntegral_(error);
     computeDerivative_(error);
-    std::cout << "error" << error << " d " << d_ << " i " << i_ << std::endl;
-    std::cout << "gains " << kp_ << " " << ki_ << "  " << kd_ << std::endl;
+    // std::cout << "error" << error << " d " << d_ << " i " << i_ << std::endl;
+    // std::cout << "gains " << kp_ << " " << ki_ << "  " << kd_ << std::endl;
     output = kp_ * setpoint + ki_ * i_ + kd_ * d_;
   }
 
