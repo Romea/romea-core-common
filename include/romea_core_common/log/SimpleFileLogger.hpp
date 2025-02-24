@@ -97,6 +97,7 @@ public:
       }
 
       file_ << "\n";
+      file_.flush();
       rowEntries_.clear();
     }
   }
