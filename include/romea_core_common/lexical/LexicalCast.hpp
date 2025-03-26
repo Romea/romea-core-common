@@ -17,6 +17,8 @@
 #define ROMEA_CORE_COMMON__LEXICAL__LEXICALCAST_HPP_
 
 // std
+#include <ios>
+#include <sstream>
 #include <string>
 #include <stdexcept>
 #include <iostream>
@@ -75,6 +77,21 @@ template<>
 inline unsigned long long lexical_cast<unsigned long long>(const std::string & str, size_t & pos)
 {
   return std::stoull(str, &pos);
+}
+
+template<>
+inline bool lexical_cast<bool>(const std::string & str, size_t & pos)
+{
+  bool result{};
+  std::istringstream iss{str};
+  iss >> std::noboolalpha >> result;
+  if(iss.fail()) {
+    iss.clear();
+    iss >> std::boolalpha >> result;
+  }
+  // iss.tellg() returns -1 for integer. This one returns the real number of characters
+  pos = iss.rdbuf()->pubseekoff(0, std::ios_base::cur, std::ios_base::in);
+  return result;
 }
 
 template<typename T>

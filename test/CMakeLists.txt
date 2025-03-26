@@ -12,6 +12,7 @@ add_subdirectory(pointset)
 add_subdirectory(transform)
 add_subdirectory(monitoring)
 add_subdirectory(diagnostics)
+add_subdirectory(lexical)
 
 
 add_executable(${PROJECT_NAME}_test_time test_time.cpp )
