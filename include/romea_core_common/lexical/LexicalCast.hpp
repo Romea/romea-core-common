@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef ROMEA_CORE_COMMON__LEXICAL__LEXICALCAST_HPP_
 #define ROMEA_CORE_COMMON__LEXICAL__LEXICALCAST_HPP_
 
 // std
+#include <algorithm>
 #include <ios>
-#include <sstream>
-#include <string>
-#include <stdexcept>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
 namespace romea
 {
@@ -82,11 +82,14 @@ inline unsigned long long lexical_cast<unsigned long long>(const std::string & s
 template<>
 inline bool lexical_cast<bool>(const std::string & str, size_t & pos)
 {
+  std::string s(str);
+
   bool result{};
-  std::istringstream iss{str};
+  std::istringstream iss{s};
   iss >> std::noboolalpha >> result;
-  if(iss.fail()) {
-    iss.clear();
+  if (iss.fail()) {
+    std::transform(begin(s), end(s), begin(s), [](unsigned char c) { return std::tolower(c); });
+    iss = std::istringstream{s};
     iss >> std::boolalpha >> result;
   }
   // iss.tellg() returns -1 for integer. This one returns the real number of characters

@@ -49,6 +49,11 @@ TEST(TestLexicalCast, bool_alpha)
 
   EXPECT_EQ(lexical_cast<bool>("true"), true);
   EXPECT_EQ(lexical_cast<bool>("false"), false);
+
+  EXPECT_EQ(lexical_cast<bool>("True"), true);
+  EXPECT_EQ(lexical_cast<bool>("False"), false);
+  EXPECT_EQ(lexical_cast<bool>("TRUE"), true);
+  EXPECT_EQ(lexical_cast<bool>("FALSE"), false);
 }
 
 TEST(TestLexicalCast, bool_alpha_error)
