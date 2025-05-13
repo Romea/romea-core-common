@@ -20,15 +20,14 @@
 #include <Eigen/Core>
 
 // std
+#include <cmath>
 #include <utility>
 #include <limits>
 #include <cassert>
 #include <algorithm>
+#include <type_traits>
 
-
-namespace romea
-{
-namespace core
+namespace romea::core
 {
 
 
@@ -49,11 +48,16 @@ public:
   : lower_(lower),
     upper_(upper)
   {
-    if((lower_.array() > upper_.array()).all())
-    {
-      lower_.array() = T::Constant(std::nan(""));
-      upper_.array() = T::Constant(std::nan(""));
-    };
+    if constexpr (std::is_floating_point_v<Scalar>) {
+      if((lower_.array() > upper_.array()).all())
+      {
+        lower_.array() = T::Constant(std::nan(""));
+        upper_.array() = T::Constant(std::nan(""));
+      };
+    }
+    else {
+      assert((lower_.array() <= upper_.array()).all());
+    }
   }
 
 public:
@@ -179,10 +183,14 @@ public:
   : lower_(lower),
     upper_(upper)
   {
-    if (lower > upper)
-    {
-      lower_ = T(std::nan(""));
-      upper_ = T(std::nan(""));
+    if constexpr (std::is_floating_point_v<Scalar>) {
+      if (lower > upper) {
+        lower_ = T(std::nan(""));
+        upper_ = T(std::nan(""));
+      };
+    }
+    else {
+      assert(lower_ <= upper_);
     }
   }
 
@@ -256,6 +264,11 @@ public:
   auto get() const {
       if constexpr (Index == 0) return lower_;
       if constexpr (Index == 1) return upper_;
+  }
+
+  bool is_empty() const
+  {
+    return std::isnan(lower_) || std::isnan(upper_);
   }
 
 private:
@@ -332,8 +345,8 @@ Interval2D<Scalar> to2D(const Interval3D<Scalar> & interval3D)
     interval3D.upper().template segment<2>(0));
 }
 
-}  // namespace core
-}  // namespace romea
+} // namespace romea::core
+
 
 namespace std
 {

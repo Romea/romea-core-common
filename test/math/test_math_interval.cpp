@@ -15,6 +15,7 @@
 
 // gtest
 #include <gtest/gtest.h>
+#include <cmath>
 
 // romea
 #include "romea_core_common/math/EulerAngles.hpp"
@@ -271,6 +272,33 @@ TEST(TestInterval, testIntervalStructuredBinding1D)
 
   EXPECT_DOUBLE_EQ(a, 3.2);
   EXPECT_DOUBLE_EQ(b, 8.5);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestInterval, testInvalidInterval)
+{
+  std::vector<std::pair<double, double>> v{
+    {1, 0},
+    {0, -1},
+    {1e-8, 0},
+    {17.3, 17.2},
+    {39478.3847, 4029.4763},
+    {-4398.3472, -6515.6843},
+  };
+
+  for(auto const & [lo, up] : v) {
+    romea::core::Interval1D<double> i{lo, up};
+    EXPECT_TRUE(std::isnan(i.lower()));
+    EXPECT_TRUE(std::isnan(i.upper()));
+    EXPECT_TRUE(std::isnan(i.center()));
+    EXPECT_TRUE(std::isnan(i.width()));
+
+    if(HasFailure()) {
+      std::cerr << "interval: [" << lo << ", " << up << "]\n";
+    }
+
+    ASSERT_TRUE(i.is_empty());
+  }
 }
 
 //-----------------------------------------------------------------------------
