@@ -51,7 +51,7 @@ humble_jammy_build:
 
 # galatic
 jazzy_noble_build:
-  image: ros:humble-ros-base-noble
+  image: ros:jazzy-ros-base-noble
   stage: build
   script:
     - colcon build --cmake-args -DBUILD_TESTS=ON
