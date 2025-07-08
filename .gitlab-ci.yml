@@ -50,7 +50,7 @@ humble_jammy_build:
     - GTEST_COLOR=1 ctest --output-on-failure
 
 # galatic
-humble_jammy_noble:
+jazzy_noble_build:
   image: ros:humble-ros-base-noble
   stage: build
   script:
