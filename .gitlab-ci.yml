@@ -48,3 +48,12 @@ humble_jammy_build:
     - colcon build --cmake-args -DBUILD_TESTS=ON
     - cd build/romea_core_common
     - GTEST_COLOR=1 ctest --output-on-failure
+
+# galatic
+humble_jammy_noble:
+  image: ros:humble-ros-base-noble
+  stage: build
+  script:
+    - colcon build --cmake-args -DBUILD_TESTS=ON
+    - cd build/romea_core_common
+    - GTEST_COLOR=1 ctest --output-on-failure
