@@ -58,6 +58,11 @@ public:
     const Scalar & cellResolution);
 
 public:
+
+  PointType getCenter()const;
+
+  IntervalType getExtremities()const;
+  
   const Scalar & getCellResolution()const;
 
   const CellIndexes & getNumberOfCellsAlongAxes()const;
@@ -66,7 +71,6 @@ public:
 
   CellIndexesOffset updateCenter(const PointType & center);
 
-public:
   CellIndexes computeCellIndexes(const PointType & point) const;
 
   PointType computeCellCenterPosition(const CellIndexes & cellIndexes) const;
