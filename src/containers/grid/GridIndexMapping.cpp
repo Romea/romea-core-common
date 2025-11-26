@@ -101,6 +101,24 @@ void GridIndexMapping<Scalar, DIM>::computeCellCentersPosition_()
 
 //-----------------------------------------------------------------------------
 template<typename Scalar, size_t DIM>
+typename GridIndexMapping<Scalar, DIM>::PointType
+GridIndexMapping<Scalar, DIM>::getCenter() const
+{
+  return computeCellCenterPosition(numberOfCellsAlongAxes_ / 2);
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
+typename GridIndexMapping<Scalar, DIM>::IntervalType
+GridIndexMapping<Scalar, DIM>::getExtremities()const
+{
+  return IntervalType(
+    computeCellCenterPosition(CellIndexes::Zero()),
+    computeCellCenterPosition(numberOfCellsAlongAxes_.array() - 1));
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
 typename GridIndexMapping<Scalar, DIM>::CellIndexesOffset
 GridIndexMapping<Scalar, DIM>::updateCenter(const PointType & center)
 {
@@ -114,7 +132,9 @@ GridIndexMapping<Scalar, DIM>::updateCenter(const PointType & center)
 
   computeCellCentersPosition_();
 
-  return ((newRoundedCenter - currentRoundedCenter) / cellResolution_).template cast<int>();
+  return (
+    round((newRoundedCenter - currentRoundedCenter).array() / cellResolution_)
+  ).template cast<int>();
 }
 
 //-----------------------------------------------------------------------------
