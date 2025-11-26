@@ -37,9 +37,9 @@ inline Eigen::Transform<Scalar, 3, Eigen::Affine> rigid_transformation3(
 
   EigenTransform rigidTransformation = EigenTransform::Identity();
   rigidTransformation.translate(translation);
-  rigidTransformation.rotate(EigenAngleAxis(angles[0], EigenVector::UnitX()));
-  rigidTransformation.rotate(EigenAngleAxis(angles[1], EigenVector::UnitY()));
   rigidTransformation.rotate(EigenAngleAxis(angles[2], EigenVector::UnitZ()));
+  rigidTransformation.rotate(EigenAngleAxis(angles[1], EigenVector::UnitY()));
+  rigidTransformation.rotate(EigenAngleAxis(angles[0], EigenVector::UnitX()));
   return rigidTransformation;
 }
 

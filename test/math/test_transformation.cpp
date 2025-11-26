@@ -17,12 +17,28 @@
 #include <gtest/gtest.h>
 
 // romea
+#include "romea_core_common/math/EulerAngles.hpp"
 #include "romea_core_common/math/Transformation.hpp"
 
 
 //-----------------------------------------------------------------------------
 TEST(TestTransformation, makeRigidTransformation)
 {
+
+  Eigen::Vector3d xyz(1,2,3);
+  Eigen::Vector3d rpy(0.1, 0.2 ,0.3);
+  auto H = romea::core::rigid_transformation3<double>(xyz, rpy);
+
+  EXPECT_DOUBLE_EQ(H.translation()(0),1.0);
+  EXPECT_DOUBLE_EQ(H.translation()(1),2.0);
+  EXPECT_DOUBLE_EQ(H.translation()(2),3.0);
+
+  auto I = romea::core::eulerAnglesToRotation3D(rpy).inverse()*H.rotation();
+  EXPECT_DOUBLE_EQ(I(0,0),1.0);
+  EXPECT_DOUBLE_EQ(I(1,1),1.0);
+  EXPECT_DOUBLE_EQ(I(2,2),1.0);
+
+
 }
 
 //-----------------------------------------------------------------------------
