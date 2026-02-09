@@ -12,75 +12,70 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef ROMEA_CORE_COMMON__LOG__SIMPLEFILELOGGER_HPP_
 #define ROMEA_CORE_COMMON__LOG__SIMPLEFILELOGGER_HPP_
 
-
 // std
-#include <string>
-#include <fstream>
-#include <vector>
 #include <cassert>
+#include <fstream>
 #include <iomanip>
+#include <string>
+#include <utility>
+#include <vector>
 
-namespace romea
-{
-namespace core
+// local
+#include "romea_core_common/log/Logger.hpp"
+
+namespace romea::core
 {
 
-class SimpleFileLogger
+class SimpleFileLogger : public Logger
 {
   struct Entry
   {
-    Entry(
-      const std::string & name,
-      const std::string & value)
-    : name(name),
-      value(value)
-    {
-    }
+    Entry(std::string name, std::string value) : name(std::move(name)), value(std::move(value)) {}
 
     std::string name;
     std::string value;
   };
 
 public:
-  SimpleFileLogger()
-  : rowEntries_(),
-    columnNames_(),
-    separator_(),
-    file_()
-  {
-  }
+  SimpleFileLogger() = default;
 
   explicit SimpleFileLogger(const std::string & filename, std::string separator = ",")
   {
-    init(filename, separator);
+    init(filename, std::move(separator));
   }
 
-  void init(
-    const std::string & filename,
-    std::string separator = ",")
+  void init(const std::string & filename, std::string separator = ",")
   {
-    separator_ = separator;
+    separator_ = std::move(separator);
     file_.open(filename);
     if (!file_.is_open()) {
-      throw std::runtime_error("Cannot open log file : " + filename);
+      throw std::runtime_error("Cannot open log file: " + filename);
     }
   }
 
-  template<typename T>
-  void addEntry(const std::string & name, const T & value)
+  void addEntry(const std::string & name, double value) override
+  {
+    addEntry(name, std::to_string(value));
+  }
+
+  void addEntry(const std::string & name, int value) override
+  {
+    addEntry(name, std::to_string(value));
+  }
+
+  void addEntry(const std::string & name, const std::string & value) override
   {
     if (file_.is_open()) {
-      rowEntries_.emplace_back(name, std::to_string(value));
+      rowEntries_.emplace_back(name, value);
     }
   }
 
-  void clearRow() { rowEntries_.clear(); }
+  void clearRow() override { rowEntries_.clear(); }
 
-  void writeRow()
+  void writeRow() override
   {
     if (file_.is_open()) {
       if (columnNames_.empty()) {
@@ -93,7 +88,7 @@ public:
         assert(columnNames_.size() == rowEntries_.size());
         file_ << std::setprecision(10);
         for (size_t n = 0; n < rowEntries_.size(); ++n) {
-          assert(columnNames_[n].compare(rowEntries_[n].name) == 0);
+          assert(columnNames_[n] == rowEntries_[n].name);
           file_ << rowEntries_[n].value << separator_;
         }
       }
@@ -111,7 +106,6 @@ private:
   std::ofstream file_;
 };
 
-}  // namespace core
-}  // namespace romea
+}  // namespace romea::core
 
 #endif  // ROMEA_CORE_COMMON__LOG__SIMPLEFILELOGGER_HPP_
