@@ -78,6 +78,8 @@ public:
     }
   }
 
+  void clearRow() { rowEntries_.clear(); }
+
   void writeRow()
   {
     if (file_.is_open()) {
