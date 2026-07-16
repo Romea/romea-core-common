@@ -42,12 +42,30 @@ TEST_F(TestCheckupReliability, compareWithLowReliability)
 }
 
 //-----------------------------------------------------------------------------
+TEST_F(TestCheckupReliability, compareAtLowReliabilityThreshold)
+{
+  EXPECT_EQ(diagnostic.evaluate(0.7), romea::core::DiagnosticStatus::WARN);
+  EXPECT_EQ(diagnostic.getReport().diagnostics.front().status, romea::core::DiagnosticStatus::WARN);
+  EXPECT_STREQ(diagnostic.getReport().diagnostics.front().message.c_str(), "foo is uncertain.");
+  EXPECT_STREQ(diagnostic.getReport().info.at("foo").c_str(), "0.7");
+}
+
+//-----------------------------------------------------------------------------
 TEST_F(TestCheckupReliability, compareWithUncertainReliability)
 {
   EXPECT_EQ(diagnostic.evaluate(0.75), romea::core::DiagnosticStatus::WARN);
   EXPECT_EQ(diagnostic.getReport().diagnostics.front().status, romea::core::DiagnosticStatus::WARN);
   EXPECT_STREQ(diagnostic.getReport().diagnostics.front().message.c_str(), "foo is uncertain.");
   EXPECT_STREQ(diagnostic.getReport().info.at("foo").c_str(), "0.75");
+}
+
+//-----------------------------------------------------------------------------
+TEST_F(TestCheckupReliability, compareAtHighReliabilityThreshold)
+{
+  EXPECT_EQ(diagnostic.evaluate(0.9), romea::core::DiagnosticStatus::OK);
+  EXPECT_EQ(diagnostic.getReport().diagnostics.front().status, romea::core::DiagnosticStatus::OK);
+  EXPECT_STREQ(diagnostic.getReport().diagnostics.front().message.c_str(), "foo is high.");
+  EXPECT_STREQ(diagnostic.getReport().info.at("foo").c_str(), "0.9");
 }
 
 //-----------------------------------------------------------------------------

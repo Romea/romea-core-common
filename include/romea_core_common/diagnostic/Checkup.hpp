@@ -45,7 +45,7 @@ public:
 
   virtual DiagnosticStatus evaluate(const T & value) = 0;
 
-  const DiagnosticReport & getReport() const;
+  DiagnosticReport getReport() const;
 
   void timeout();
 
@@ -84,7 +84,7 @@ Checkup<T>::Checkup(
 
 //-----------------------------------------------------------------------------
 template<typename T>
-const DiagnosticReport & Checkup<T>::getReport() const
+DiagnosticReport Checkup<T>::getReport() const
 {
   std::lock_guard<std::mutex> lock(mutex_);
   return report_;

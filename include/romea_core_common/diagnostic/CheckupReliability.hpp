@@ -41,15 +41,15 @@ public:
   DiagnosticReport getReport()const;
 
 private:
-  void setRelabilityValue_(const double & reliability);
+  void setReliabilityValue_(const double & reliability);
 
   void setDiagnostic_(
     const DiagnosticStatus & status,
     const std::string & messageEnd);
 
 private:
-  double low_reliability_theshold_;
-  double high_reliability_theshold_;
+  double low_reliability_threshold_;
+  double high_reliability_threshold_;
 
   mutable std::mutex mutex_;
   DiagnosticReport report_;

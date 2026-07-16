@@ -37,7 +37,8 @@ RateMonitoring::RateMonitoring()
   lastDuration_(Duration::zero()),
   periods_(),
   periodsSum_(0),
-  rate_(0)
+  rate_(0),
+  mutex_()
 {
 }
 
@@ -50,19 +51,22 @@ RateMonitoring::RateMonitoring(const double & expectedRate)
 
 //-----------------------------------------------------------------------------
 RateMonitoring::RateMonitoring(const RateMonitoring & rateMonitoring)
-: windowSize_(rateMonitoring.windowSize_),
-  lastPeriod_(rateMonitoring.lastPeriod_),
-  lastDuration_(rateMonitoring.lastDuration_.load()),
-  periods_(rateMonitoring.periods_),
-  periodsSum_(rateMonitoring.periodsSum_),
-  rate_(rateMonitoring.rate_.load())
+: RateMonitoring()
 {
+  std::lock_guard<std::mutex> lock(rateMonitoring.mutex_);
+  windowSize_ = rateMonitoring.windowSize_;
+  lastPeriod_ = rateMonitoring.lastPeriod_;
+  lastDuration_.store(rateMonitoring.lastDuration_.load());
+  periods_ = rateMonitoring.periods_;
+  periodsSum_ = rateMonitoring.periodsSum_;
+  rate_.store(rateMonitoring.rate_.load());
 }
 
 
 //-----------------------------------------------------------------------------
 void RateMonitoring::initialize(const double & expectedRate)
 {
+  std::lock_guard<std::mutex> lock(mutex_);
   windowSize_ = static_cast<size_t>(2 * expectedRate);
   windowSize_ = std::max(windowSize_, MINIMAL_WINDOW_SIZE);
   windowSize_ = std::min(windowSize_, MAXIMAL_WINDOW_SIZE);
@@ -71,6 +75,7 @@ void RateMonitoring::initialize(const double & expectedRate)
 //-----------------------------------------------------------------------------
 double RateMonitoring::update(const Duration & duration)
 {
+  std::lock_guard<std::mutex> lock(mutex_);
   assert(windowSize_ != 0);
 
   lastPeriod_ = duration - lastDuration_.load();
@@ -93,12 +98,14 @@ double RateMonitoring::update(const Duration & duration)
 //-----------------------------------------------------------------------------
 double RateMonitoring::getRate()const
 {
+  std::lock_guard<std::mutex> lock(mutex_);
   return rate_.load();
 }
 
 //-----------------------------------------------------------------------------
 bool RateMonitoring::timeout(const Duration & duration)
 {
+  std::lock_guard<std::mutex> lock(mutex_);
   if (!periods_.empty() &&
     durationToSecond(duration - lastDuration_.load()) > 0.5)
   {

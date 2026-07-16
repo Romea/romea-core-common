@@ -56,6 +56,7 @@ CheckupEqualTo<T>::CheckupEqualTo(
 template<typename T>
 DiagnosticStatus CheckupEqualTo<T>::evaluate(const T & value)
 {
+  std::lock_guard<std::mutex> lock(this->mutex_);
   if (value < this->value_to_compare_with_ - this->epsilon_) {
     this->setDiagnostic_(DiagnosticStatus::ERROR, " is too low.");
   } else if (value > this->value_to_compare_with_ + this->epsilon_) {

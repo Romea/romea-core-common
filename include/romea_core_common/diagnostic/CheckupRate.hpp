@@ -18,7 +18,6 @@
 
 // std
 #include <string>
-#include <mutex>
 
 // romea
 #include "romea_core_common/diagnostic/CheckupEqualTo.hpp"
@@ -37,7 +36,7 @@ public:
   CheckupRate(
     const std::string & name,
     const double & rate,
-    const double & espilon);
+    const double & epsilon);
 
   DiagnosticStatus evaluate(const Duration & stamp);
 
@@ -48,9 +47,6 @@ public:
 private:
   RateMonitoring rateMonitoring_;
   CheckupType checkup_;
-
-  mutable std::mutex mutex_;
-  DiagnosticReport report_;
 };
 
 

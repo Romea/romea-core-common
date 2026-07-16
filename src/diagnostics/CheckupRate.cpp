@@ -13,11 +13,6 @@
 // limitations under the License.
 
 
-// std
-#include <sstream>
-#include <iostream>
-#include <string>
-
 // romea
 #include "romea_core_common/diagnostic/CheckupRate.hpp"
 
@@ -32,11 +27,11 @@ template<typename CheckupType>
 CheckupRate<CheckupType>::CheckupRate(
   const std::string & name,
   const double & rate,
-  const double & espilon)
+  const double & epsilon)
 : rateMonitoring_(rate),
   checkup_(name + "_rate",
     rate,
-    espilon,
+    epsilon,
     Diagnostic(DiagnosticStatus::ERROR, "no data received from " + name))
 {
 }

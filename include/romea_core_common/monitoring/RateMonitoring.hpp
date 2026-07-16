@@ -19,6 +19,7 @@
 // std
 #include <queue>
 #include <atomic>
+#include <mutex>
 
 // romea
 #include "romea_core_common/time/Time.hpp"
@@ -54,6 +55,7 @@ private:
   std::queue<int64_t> periods_;
   int64_t periodsSum_;
   std::atomic<double> rate_;
+  mutable std::mutex mutex_;
 };
 
 }  // namespace core

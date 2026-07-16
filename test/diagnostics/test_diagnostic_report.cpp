@@ -38,14 +38,16 @@ TEST(TestDiagnosticReport, checkSetInfosValues)
   romea::core::setReportInfo(report, "foo", 1.2);
   romea::core::setReportInfo(report, "bar", "hello");
   romea::core::setReportInfo(report, "baz", -2);
+  romea::core::setReportInfo(report, "qux", true);
 
   EXPECT_STREQ(report.info.at("foo").c_str(), "1.2");
   EXPECT_STREQ(report.info.at("bar").c_str(), "hello");
   EXPECT_STREQ(report.info.at("baz").c_str(), "-2");
+  EXPECT_STREQ(report.info.at("qux").c_str(), "true");
 }
 
 //-----------------------------------------------------------------------------
-TEST(TestDiagnosticReport, checkSetReportOtionalInfosValues)
+TEST(TestDiagnosticReport, checkSetReportOptionalInfosValues)
 {
   romea::core::DiagnosticReport report;
   std::optional<double> foo(7.77);
@@ -59,7 +61,7 @@ TEST(TestDiagnosticReport, checkSetReportOtionalInfosValues)
 }
 
 //-----------------------------------------------------------------------------
-TEST(TestDiagnosticReport, checkAgregation)
+TEST(TestDiagnosticReport, checkAggregation)
 {
   romea::core::DiagnosticReport report1;
   report1.diagnostics.emplace_back(romea::core::DiagnosticStatus::OK, std::string("foo"));

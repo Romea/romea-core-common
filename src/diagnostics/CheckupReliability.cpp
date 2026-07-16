@@ -27,10 +27,10 @@ namespace core
 //-----------------------------------------------------------------------------
 CheckupReliability::CheckupReliability(
   const std::string & name,
-  const double & low_reliability_theshold,
-  const double & high_reliability_theshold)
-: low_reliability_theshold_(low_reliability_theshold),
-  high_reliability_theshold_(high_reliability_theshold),
+  const double & low_reliability_threshold,
+  const double & high_reliability_threshold)
+: low_reliability_threshold_(low_reliability_threshold),
+  high_reliability_threshold_(high_reliability_threshold),
   report_()
 {
   report_.info[name] = "";
@@ -41,15 +41,15 @@ CheckupReliability::CheckupReliability(
 DiagnosticStatus CheckupReliability::evaluate(const double & reliability)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  if (reliability < low_reliability_theshold_) {
+  if (reliability < low_reliability_threshold_) {
     setDiagnostic_(DiagnosticStatus::ERROR, " is too low.");
-  } else if (reliability < high_reliability_theshold_) {
+  } else if (reliability < high_reliability_threshold_) {
     setDiagnostic_(DiagnosticStatus::WARN, " is uncertain.");
   } else {
     setDiagnostic_(DiagnosticStatus::OK, " is high.");
   }
 
-  setRelabilityValue_(reliability);
+  setReliabilityValue_(reliability);
   return report_.diagnostics.front().status;
 }
 
@@ -61,7 +61,7 @@ DiagnosticReport CheckupReliability::getReport()const
 }
 
 //-----------------------------------------------------------------------------
-void CheckupReliability::setRelabilityValue_(const double & reliability)
+void CheckupReliability::setReliabilityValue_(const double & reliability)
 {
   report_.info.begin()->second = toStringInfoValue(reliability);
 }

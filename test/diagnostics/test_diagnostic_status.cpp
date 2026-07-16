@@ -16,6 +16,10 @@
 // gtest
 #include <gtest/gtest.h>
 
+// std
+#include <list>
+#include <sstream>
+
 // romea
 #include "romea_core_common/diagnostic/Diagnostic.hpp"
 
@@ -30,15 +34,32 @@ TEST(TestDiagnosticStatus, checkComparison)
 //-----------------------------------------------------------------------------
 TEST(TestDiagnosticStatus, checkWorseStatus)
 {
-  EXPECT_EQ(
-    worse(
-      romea::core::DiagnosticStatus::OK,
-      romea::core::DiagnosticStatus::OK), romea::core::DiagnosticStatus::OK);
+  using romea::core::DiagnosticStatus;
 
+  EXPECT_EQ(worse(DiagnosticStatus::OK, DiagnosticStatus::OK), DiagnosticStatus::OK);
+  EXPECT_EQ(worse(DiagnosticStatus::OK, DiagnosticStatus::WARN), DiagnosticStatus::WARN);
+  EXPECT_EQ(worse(DiagnosticStatus::ERROR, DiagnosticStatus::WARN), DiagnosticStatus::ERROR);
+  EXPECT_EQ(worse(DiagnosticStatus::STALE, DiagnosticStatus::ERROR), DiagnosticStatus::STALE);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestDiagnosticStatus, checkDiagnosticListStatus)
+{
+  using romea::core::Diagnostic;
+  using romea::core::DiagnosticStatus;
+
+  EXPECT_TRUE(
+    romea::core::allOK(
+      {Diagnostic(DiagnosticStatus::OK, "foo"), Diagnostic(DiagnosticStatus::OK, "bar")}));
+  EXPECT_FALSE(
+    romea::core::allOK(
+      {Diagnostic(DiagnosticStatus::OK, "foo"), Diagnostic(DiagnosticStatus::WARN, "bar")}));
   EXPECT_EQ(
-    worse(
-      romea::core::DiagnosticStatus::OK,
-      romea::core::DiagnosticStatus::WARN), romea::core::DiagnosticStatus::WARN);
+    romea::core::worseStatus(
+      {Diagnostic(DiagnosticStatus::OK, "foo"),
+        Diagnostic(DiagnosticStatus::ERROR, "bar"),
+        Diagnostic(DiagnosticStatus::WARN, "baz")}),
+    DiagnosticStatus::ERROR);
 }
 
 //-----------------------------------------------------------------------------
@@ -48,6 +69,18 @@ TEST(TestDiagnosticStatus, checkToStringConversion)
   EXPECT_STREQ(toString(romea::core::DiagnosticStatus::WARN).c_str(), "WARN");
   EXPECT_STREQ(toString(romea::core::DiagnosticStatus::ERROR).c_str(), "ERROR");
   EXPECT_STREQ(toString(romea::core::DiagnosticStatus::STALE).c_str(), "STALE");
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestDiagnosticStatus, checkStreamConversion)
+{
+  std::ostringstream statusStream;
+  statusStream << romea::core::DiagnosticStatus::WARN;
+  EXPECT_EQ(statusStream.str(), "WARN");
+
+  std::ostringstream diagnosticStream;
+  diagnosticStream << romea::core::Diagnostic(romea::core::DiagnosticStatus::ERROR, "foo failed");
+  EXPECT_EQ(diagnosticStream.str(), "ERROR : foo failed");
 }
 
 //-----------------------------------------------------------------------------

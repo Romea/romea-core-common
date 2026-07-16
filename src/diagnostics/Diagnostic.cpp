@@ -60,6 +60,7 @@ DiagnosticStatus worseStatus(const std::list<Diagnostic> & diagnostics)
 //-----------------------------------------------------------------------------
 bool allOK(const std::list<Diagnostic> & diagnostics)
 {
+  assert(!diagnostics.empty());
   return worseStatus(diagnostics) == DiagnosticStatus::OK;
 }
 

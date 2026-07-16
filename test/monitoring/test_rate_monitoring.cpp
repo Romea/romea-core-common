@@ -25,13 +25,28 @@ TEST(TestMonitoring, rate)
   double expectedRate = 10;
   romea::core::RateMonitoring rateMonitoring(expectedRate);
 
-  romea::core::Duration stamp = romea::core::durationFromSecond(0);
-  EXPECT_DOUBLE_EQ(rateMonitoring.update(stamp), 0.);
+  EXPECT_DOUBLE_EQ(rateMonitoring.update(romea::core::durationFromSecond(0)), 0.);
 
-  for (size_t n = 1; n < 2 / static_cast<size_t>(expectedRate); ++n) {
+  for (size_t n = 1; n < 2 * static_cast<size_t>(expectedRate); ++n) {
     romea::core::Duration stamp = romea::core::durationFromSecond(n / expectedRate);
-    EXPECT_DOUBLE_EQ(rateMonitoring.update(stamp), expectedRate);
+    EXPECT_DOUBLE_EQ(rateMonitoring.update(stamp), 0.);
   }
+
+  EXPECT_DOUBLE_EQ(
+    rateMonitoring.update(romea::core::durationFromSecond(2)),
+    expectedRate);
+  EXPECT_DOUBLE_EQ(rateMonitoring.getRate(), expectedRate);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestMonitoring, timeout)
+{
+  romea::core::RateMonitoring rateMonitoring(10);
+
+  EXPECT_DOUBLE_EQ(rateMonitoring.update(romea::core::durationFromSecond(0)), 0.);
+  EXPECT_FALSE(rateMonitoring.timeout(romea::core::durationFromSecond(0.49)));
+  EXPECT_TRUE(rateMonitoring.timeout(romea::core::durationFromSecond(0.51)));
+  EXPECT_DOUBLE_EQ(rateMonitoring.getRate(), 0.);
 }
 
 //-----------------------------------------------------------------------------

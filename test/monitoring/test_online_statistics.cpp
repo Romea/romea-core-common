@@ -16,50 +16,62 @@
 // gtest
 #include <gtest/gtest.h>
 
-// Eigen
-#include <Eigen/Eigen>
-
 // std
-#include <random>
+#include <cmath>
 
 // romea
 #include "romea_core_common/monitoring/OnlineVariance.hpp"
 
 //-----------------------------------------------------------------------------
-TEST(TestMonitoring, onlineVariance)
+TEST(TestMonitoring, onlineAverage)
 {
-  double mean = -1;
-  double std = 0.2;
-  double average_precision = 0.0001;
-  size_t N = 10000;
+  romea::core::OnlineAverage onlineAverage(0.001, 4);
 
-  std::mt19937 randomEngine(std::random_device{}());
-  std::normal_distribution<double> normalDistribution(mean, std);
+  EXPECT_FALSE(onlineAverage.isAvailable());
+  EXPECT_TRUE(std::isnan(onlineAverage.getAverage()));
 
-  romea::core::OnlineAverage onlineAverage(average_precision, N);
-  romea::core::OnlineVariance onlineVariance(average_precision, N);
-  onlineAverage.update(0);
-  onlineVariance.update(0);
+  onlineAverage.update(1);
+  onlineAverage.update(2);
+  onlineAverage.update(3);
+  onlineAverage.update(4);
 
-  Eigen::ArrayXd data(N);
-  for (size_t n = 0; n < N; ++n) {
-    data(n) = normalDistribution(randomEngine);
-    onlineAverage.update(data(n));
-    onlineVariance.update(data(n));
-  }
+  EXPECT_TRUE(onlineAverage.isAvailable());
+  EXPECT_DOUBLE_EQ(onlineAverage.getAverage(), 2.5);
 
-
-  EXPECT_EQ(onlineAverage.isAvailable(), true);
-  EXPECT_EQ(onlineVariance.isAvailable(), true);
-
-  EXPECT_NEAR(mean, onlineAverage.getAverage(), 0.01);
-  EXPECT_NEAR(mean, onlineVariance.getAverage(), 0.01);
-  EXPECT_NEAR(std, std::sqrt(onlineVariance.getVariance()), 0.01);
+  onlineAverage.update(5);
+  EXPECT_DOUBLE_EQ(onlineAverage.getAverage(), 3.5);
 
   onlineAverage.reset();
+  EXPECT_FALSE(onlineAverage.isAvailable());
+  EXPECT_TRUE(std::isnan(onlineAverage.getAverage()));
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestMonitoring, onlineVariance)
+{
+  romea::core::OnlineVariance onlineVariance(0.001, 4);
+
+  EXPECT_FALSE(onlineVariance.isAvailable());
+  EXPECT_TRUE(std::isnan(onlineVariance.getAverage()));
+  EXPECT_TRUE(std::isnan(onlineVariance.getVariance()));
+
+  onlineVariance.update(1);
+  onlineVariance.update(2);
+  onlineVariance.update(3);
+  onlineVariance.update(4);
+
+  EXPECT_TRUE(onlineVariance.isAvailable());
+  EXPECT_DOUBLE_EQ(onlineVariance.getAverage(), 2.5);
+  EXPECT_NEAR(onlineVariance.getVariance(), 5. / 3., 1e-12);
+
+  onlineVariance.update(5);
+  EXPECT_DOUBLE_EQ(onlineVariance.getAverage(), 3.5);
+  EXPECT_NEAR(onlineVariance.getVariance(), 5. / 3., 1e-12);
+
   onlineVariance.reset();
-  EXPECT_EQ(onlineAverage.isAvailable(), false);
-  EXPECT_EQ(onlineVariance.isAvailable(), false);
+  EXPECT_FALSE(onlineVariance.isAvailable());
+  EXPECT_TRUE(std::isnan(onlineVariance.getAverage()));
+  EXPECT_TRUE(std::isnan(onlineVariance.getVariance()));
 }
 
 //-----------------------------------------------------------------------------

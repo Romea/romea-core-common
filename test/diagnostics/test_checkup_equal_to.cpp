@@ -21,7 +21,7 @@
 
 
 //-----------------------------------------------------------------------------
-TEST(TestCheckupEqualTo, checkValueIsToHigh)
+TEST(TestCheckupEqualTo, checkValueIsTooHigh)
 {
   romea::core::CheckupEqualTo<double> checkup("foo", 1.0, 0.1);
   EXPECT_EQ(checkup.evaluate(1.2), romea::core::DiagnosticStatus::ERROR);
