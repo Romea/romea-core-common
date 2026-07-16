@@ -1,4 +1,5 @@
-// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Copyright 2022 INRAE, French National Research Institute for Agriculture,
+// Food and Environment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +12,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 
 #ifndef ROMEA_CORE_COMMON__CONTAINERS__GRID__GRIDINDEXMAPPING_HPP_
 #define ROMEA_CORE_COMMON__CONTAINERS__GRID__GRIDINDEXMAPPING_HPP_
@@ -26,66 +26,57 @@
 // Romea
 #include "romea_core_common/math/Interval.hpp"
 
-namespace romea
-{
-namespace core
-{
+namespace romea {
+namespace core {
 
-template<typename Scalar, size_t DIM>
-class GridIndexMapping
-{
-public:
+template <typename Scalar, size_t DIM>
+class GridIndexMapping {
+ public:
   using IntervalType = Interval<Scalar, DIM>;
   using PointType = Eigen::Matrix<Scalar, DIM, 1>;
   using CellIndexes = Eigen::Matrix<size_t, DIM, 1>;
   using CellIndexesOffset = Eigen::Matrix<int, DIM, 1>;
 
-public:
+ public:
   GridIndexMapping();
 
+  GridIndexMapping(const Scalar& maximal_range, const Scalar& cellResolution);
 
-  GridIndexMapping(
-    const Scalar & maximalRange,
-    const Scalar & cellResolution);
+  GridIndexMapping(const PointType& center, const Scalar& maximal_range,
+                   const Scalar& cellResolution);
 
-  GridIndexMapping(
-    const PointType & center,
-    const Scalar & maximalRange,
-    const Scalar & cellResolution);
+  GridIndexMapping(const IntervalType& extremities,
+                   const Scalar& cellResolution);
 
-  GridIndexMapping(
-    const IntervalType & extremities,
-    const Scalar & cellResolution);
+ public:
+  PointType getCenter() const;
 
-public:
+  IntervalType getExtremities() const;
 
-  PointType getCenter()const;
+  const Scalar& getCellResolution() const;
 
-  IntervalType getExtremities()const;
-  
-  const Scalar & getCellResolution()const;
+  const CellIndexes& getNumberOfCellsAlongAxes() const;
 
-  const CellIndexes & getNumberOfCellsAlongAxes()const;
+  const std::vector<Scalar>& getCellCentersPositionAlong(
+      const size_t& axisDIM) const;
 
-  const std::vector<Scalar> & getCellCentersPositionAlong(const size_t & axisDIM) const;
+  CellIndexesOffset updateCenter(const PointType& center);
 
-  CellIndexesOffset updateCenter(const PointType & center);
+  CellIndexes computeCellIndexes(const PointType& point) const;
 
-  CellIndexes computeCellIndexes(const PointType & point) const;
+  PointType computeCellCenterPosition(const CellIndexes& cellIndexes) const;
 
-  PointType computeCellCenterPosition(const CellIndexes & cellIndexes) const;
-
-protected:
+ protected:
   void computeCellCentersPosition_();
 
-protected:
+ protected:
   Scalar cellResolution_;
   CellIndexes numberOfCellsAlongAxes_;
   PointType minimalValuesAlongAxes_;
   PointType maximalValuesAlongAxes_;
   std::vector<std::vector<Scalar>> cellCentersPositionAlongAxes_;
 
-public:
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(Scalar, DIM)
 };
 

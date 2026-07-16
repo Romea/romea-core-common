@@ -197,6 +197,18 @@ TEST_F(TestCircularGrid3D, hasEmptyValuesAfterTranslate)
 }
 
 //-----------------------------------------------------------------------------
+TEST_F(TestCircularGrid3D, hasEmptyPlaneAfterNegativeZTranslate)
+{
+  grid.translate(CellIndexesOffset(0, 0, -1), -1);
+
+  for (size_t yi = 0; yi < 3; ++yi) {
+    for (size_t xi = 0; xi < 3; ++xi) {
+      EXPECT_EQ(grid(CellIndexes(xi, yi, 0)), -1);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

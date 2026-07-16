@@ -1,4 +1,5 @@
-// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Copyright 2022 INRAE, French National Research Institute for Agriculture,
+// Food and Environment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // gtest
 #include <gtest/gtest.h>
 
-// std
-#include <iostream>
-#include <chrono>
-
-
 // romea
 #include "romea_core_common/containers/grid/GridIndexMapping.hpp"
-#include "romea_core_common/containers/grid/WrappableGrid.hpp"
 #include "romea_core_common/containers/grid/RayTracing.hpp"
-
+#include "romea_core_common/containers/grid/WrappableGrid.hpp"
 
 //-----------------------------------------------------------------------------
-TEST(TestContainers, testRayCasting2d)
-{
+TEST(TestContainers, testRayCasting2d) {
   typedef typename romea::core::GridIndexMapping2d::PointType PointType;
   typedef typename romea::core::GridIndexMapping2d::CellIndexes CellIndexes;
 
@@ -62,7 +55,7 @@ TEST(TestContainers, testRayCasting2d)
 
     {
       romea::core::VectorOfEigenVector<CellIndexes> ray =
-        rayCasting.cast(PointType(0, 5));
+          rayCasting.cast(PointType(0, 5));
 
       EXPECT_EQ(ray.front().x(), 100);
       EXPECT_EQ(ray.front().y(), 100);
@@ -72,7 +65,7 @@ TEST(TestContainers, testRayCasting2d)
 
     {
       romea::core::VectorOfEigenVector<CellIndexes> ray =
-        rayCasting.cast(PointType(-6.3, 7), PointType(5.1, 8.2));
+          rayCasting.cast(PointType(-6.3, 7), PointType(5.1, 8.2));
 
       EXPECT_EQ(ray.front().x(), 37);
       EXPECT_EQ(ray.front().y(), 170);
@@ -83,8 +76,23 @@ TEST(TestContainers, testRayCasting2d)
 }
 
 //-----------------------------------------------------------------------------
-TEST(TestContainers, testRayIterativeCasting2d)
-{
+TEST(TestContainers, testRayCasting2dZeroLengthRay) {
+  using PointType = romea::core::GridIndexMapping2d::PointType;
+  using CellIndexes = romea::core::GridIndexMapping2d::CellIndexes;
+
+  romea::core::GridIndexMapping2d gridIndexMapping(10., 0.1);
+  romea::core::RayCasting2d rayCasting(&gridIndexMapping);
+
+  rayCasting.setOriginPoint(PointType(1.2, -0.4));
+  romea::core::VectorOfEigenVector<CellIndexes> ray = rayCasting.cast(PointType(1.2, -0.4));
+
+  ASSERT_EQ(ray.size(), 1u);
+  EXPECT_EQ(ray.front().x(), rayCasting.getOriginPointIndexes().x());
+  EXPECT_EQ(ray.front().y(), rayCasting.getOriginPointIndexes().y());
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestContainers, testRayIterativeCasting2d) {
   typedef typename romea::core::GridIndexMapping2d::PointType PointType;
   typedef typename romea::core::GridIndexMapping2d::CellIndexes CellIndexes;
 
@@ -116,8 +124,7 @@ TEST(TestContainers, testRayIterativeCasting2d)
 }
 
 //-----------------------------------------------------------------------------
-TEST(TestContainers, testRayCasting3d)
-{
+TEST(TestContainers, testRayCasting3d) {
   typedef typename romea::core::GridIndexMapping3d::PointType PointType;
   typedef typename romea::core::GridIndexMapping3d::CellIndexes CellIndexes;
 
@@ -140,6 +147,22 @@ TEST(TestContainers, testRayCasting3d)
   EXPECT_EQ(endPointIndexes.z(), ray.back().z());
 }
 
+//-----------------------------------------------------------------------------
+TEST(TestContainers, testRayCasting3dZeroLengthRay) {
+  using PointType = romea::core::GridIndexMapping3d::PointType;
+  using CellIndexes = romea::core::GridIndexMapping3d::CellIndexes;
+
+  romea::core::GridIndexMapping3d gridIndexMapping(10., 0.1);
+  romea::core::RayCasting3d rayCasting(&gridIndexMapping);
+
+  rayCasting.setOriginPoint(PointType(1.2, -0.4, 2.3));
+  romea::core::VectorOfEigenVector<CellIndexes> ray = rayCasting.cast(PointType(1.2, -0.4, 2.3));
+
+  ASSERT_EQ(ray.size(), 1u);
+  EXPECT_EQ(ray.front().x(), rayCasting.getOriginPointIndexes().x());
+  EXPECT_EQ(ray.front().y(), rayCasting.getOriginPointIndexes().y());
+  EXPECT_EQ(ray.front().z(), rayCasting.getOriginPointIndexes().z());
+}
 
 ////-----------------------------------------------------------------------------
 // TEST(TestContainers,testRayCasting2dOutRange)
@@ -152,37 +175,35 @@ TEST(TestContainers, testRayCasting3d)
 //  romea::RayCasting2d rayCasting(&gridIndexMapping);
 //  romea::Grid<float,2> grid(gridIndexMapping.getNumberOfCellsAlongAxes());
 
-
 //  rayCasting.setOriginPoint(PointType(0,0));
 //  rayCasting.setEndPoint(PointType(4.75192,0.415739));
 
 ////  CellIndexes originPointIndexes = rayCasting.getOriginPointIndexes();
 ////  CellIndexes endPointIndexes = rayCasting.getEndPointIndexes();
 
-
 //  CellIndexes nextPointIndexes=rayCasting.getOriginPointIndexes();
 //  rayCasting.next(nextPointIndexes);
 
 //}
-
 
 ////-----------------------------------------------------------------------------
 // TEST(TestContainers,testRadarCast)
 //{
 //  const size_t numberOfRay =401;
 //  const size_t numberOfDataByRay =512;
-//  const size_t numberOfParticles =100;
+//  const size_t number_of_particles =100;
 //  const float resolution =0.2;
 
-//  romea::GridIndexMapping2f gridIndexMapping(numberOfDataByRay*resolution,resolution);
+//  romea::GridIndexMapping2f
+//  gridIndexMapping(numberOfDataByRay*resolution,resolution);
 //  romea::Grid<int,2> grid(gridIndexMapping.getNumberOfCellsAlongAxes());
-//  Eigen::ArrayXf x = Eigen::VectorXf::Zero(numberOfParticles);
-//  Eigen::ArrayXf y = Eigen::VectorXf::Zero(numberOfParticles);
-//  Eigen::ArrayXf cosyaw = Eigen::VectorXf::Zero(numberOfParticles);
-//  Eigen::ArrayXf sinyaw = Eigen::VectorXf::Zero(numberOfParticles);
-//  Eigen::ArrayXf w = Eigen::VectorXf::Zero(numberOfParticles);
-//  Eigen::ArrayXf xi = Eigen::VectorXf::Zero(numberOfParticles);
-//  Eigen::ArrayXf yi = Eigen::VectorXf::Zero(numberOfParticles);
+//  Eigen::ArrayXf x = Eigen::VectorXf::Zero(number_of_particles);
+//  Eigen::ArrayXf y = Eigen::VectorXf::Zero(number_of_particles);
+//  Eigen::ArrayXf cosyaw = Eigen::VectorXf::Zero(number_of_particles);
+//  Eigen::ArrayXf sinyaw = Eigen::VectorXf::Zero(number_of_particles);
+//  Eigen::ArrayXf w = Eigen::VectorXf::Zero(number_of_particles);
+//  Eigen::ArrayXf xi = Eigen::VectorXf::Zero(number_of_particles);
+//  Eigen::ArrayXf yi = Eigen::VectorXf::Zero(number_of_particles);
 //  Eigen::ArrayXi amplitudes = Eigen::VectorXi::Zero(numberOfDataByRay);
 //  Eigen::ArrayXi map_amplitudes = Eigen::VectorXi::Zero(numberOfDataByRay);
 
@@ -200,10 +221,10 @@ TEST(TestContainers, testRayCasting3d)
 //        xi = (x+ (cosyaw*costheta - sinyaw*sintheta)*d);
 //        yi = (y+ (cosyaw*sintheta + sinyaw*costheta)*d);
 
-
-//        for( size_t n=0; n <numberOfParticles ;n++)
+//        for( size_t n=0; n <number_of_particles ;n++)
 //        {
-//          pi = gridIndexMapping.computeCellIndexes(Eigen::Vector2f(xi(n),yi(n)));
+//          pi =
+//          gridIndexMapping.computeCellIndexes(Eigen::Vector2f(xi(n),yi(n)));
 //          map_amplitudes(n)=grid(pi);
 //        }
 
@@ -217,10 +238,8 @@ TEST(TestContainers, testRayCasting3d)
 //  std::cout << "time ellapsed " <<diff.count() << std::endl;
 //}
 
-
 //-----------------------------------------------------------------------------
-int main(int argc, char ** argv)
-{
+int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

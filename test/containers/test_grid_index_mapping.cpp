@@ -48,6 +48,42 @@ TEST_F(TestGridIndexMapping2d, isNumberOfCellsOK)
 }
 
 //-----------------------------------------------------------------------------
+TEST_F(TestGridIndexMapping2d, isCenterOK)
+{
+  PointType center = gridMapping.getCenter();
+
+  EXPECT_DOUBLE_EQ(center.x(), 10.);
+  EXPECT_DOUBLE_EQ(center.y(), -7.);
+}
+
+//-----------------------------------------------------------------------------
+TEST_F(TestGridIndexMapping2d, isExtremitiesOK)
+{
+  romea::core::Interval2D<double> extremities = gridMapping.getExtremities();
+
+  EXPECT_DOUBLE_EQ(extremities.lower().x(), 9.);
+  EXPECT_DOUBLE_EQ(extremities.lower().y(), -9.);
+  EXPECT_DOUBLE_EQ(extremities.upper().x(), 11.);
+  EXPECT_DOUBLE_EQ(extremities.upper().y(), -5.);
+}
+
+//-----------------------------------------------------------------------------
+TEST_F(TestGridIndexMapping2d, isCellCentersPositionAlongAxesOK)
+{
+  const auto & xCenters = gridMapping.getCellCentersPositionAlong(0);
+  const auto & yCenters = gridMapping.getCellCentersPositionAlong(1);
+
+  ASSERT_EQ(xCenters.size(), 3u);
+  ASSERT_EQ(yCenters.size(), 5u);
+  EXPECT_DOUBLE_EQ(xCenters[0], 9.);
+  EXPECT_DOUBLE_EQ(xCenters[1], 10.);
+  EXPECT_DOUBLE_EQ(xCenters[2], 11.);
+  EXPECT_DOUBLE_EQ(yCenters[0], -9.);
+  EXPECT_DOUBLE_EQ(yCenters[2], -7.);
+  EXPECT_DOUBLE_EQ(yCenters[4], -5.);
+}
+
+//-----------------------------------------------------------------------------
 TEST_F(TestGridIndexMapping2d, isComputeCellCenterPositionOK)
 {
   {
@@ -112,6 +148,29 @@ TEST_F(TestGridIndexMapping3d, isNumberOfCellsOK)
   EXPECT_EQ(gridMapping.getNumberOfCellsAlongAxes().x(), 3);
   EXPECT_EQ(gridMapping.getNumberOfCellsAlongAxes().y(), 5);
   EXPECT_EQ(gridMapping.getNumberOfCellsAlongAxes().z(), 7);
+}
+
+//-----------------------------------------------------------------------------
+TEST_F(TestGridIndexMapping3d, isCenterOK)
+{
+  PointType center = gridMapping.getCenter();
+
+  EXPECT_DOUBLE_EQ(center.x(), 0.);
+  EXPECT_DOUBLE_EQ(center.y(), 0.);
+  EXPECT_DOUBLE_EQ(center.z(), 0.);
+}
+
+//-----------------------------------------------------------------------------
+TEST_F(TestGridIndexMapping3d, isExtremitiesOK)
+{
+  romea::core::Interval3D<double> extremities = gridMapping.getExtremities();
+
+  EXPECT_DOUBLE_EQ(extremities.lower().x(), -1.);
+  EXPECT_DOUBLE_EQ(extremities.lower().y(), -2.);
+  EXPECT_DOUBLE_EQ(extremities.lower().z(), -3.);
+  EXPECT_DOUBLE_EQ(extremities.upper().x(), 1.);
+  EXPECT_DOUBLE_EQ(extremities.upper().y(), 2.);
+  EXPECT_DOUBLE_EQ(extremities.upper().z(), 3.);
 }
 
 //-----------------------------------------------------------------------------

@@ -16,6 +16,9 @@
 // gtest
 #include <gtest/gtest.h>
 
+// Eigen
+#include <Eigen/Geometry>
+
 // romea
 #include "romea_core_common/containers/boundingbox/AxisAlignedBoundingBox.hpp"
 #include "romea_core_common/containers/boundingbox/OrientedBoundingBox.hpp"
@@ -37,6 +40,27 @@ TEST(TestContainers, testAABB)
   EXPECT_DOUBLE_EQ(interval.lower()[1], center[1] - halfWidthExtents[1]);
   EXPECT_DOUBLE_EQ(interval.upper()[0], center[0] + halfWidthExtents[0]);
   EXPECT_DOUBLE_EQ(interval.upper()[1], center[1] + halfWidthExtents[1]);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestContainers, testOBB)
+{
+  Eigen::Vector2d center{1.5, 5.6};
+  Eigen::Vector2d halfWidthExtents{3.4, 2.1};
+  constexpr double pi = 3.14159265358979323846;
+  Eigen::Matrix2d rotation = Eigen::Rotation2Dd(pi / 2.).toRotationMatrix();
+  romea::core::OrientedBoundingBox2d obb(center, halfWidthExtents, rotation);
+
+  EXPECT_TRUE(obb.isInside(center + rotation * Eigen::Vector2d(3.3, 2.0)));
+  EXPECT_TRUE(obb.isInside(center + rotation * Eigen::Vector2d(-3.3, -2.0)));
+  EXPECT_FALSE(obb.isInside(center + rotation * Eigen::Vector2d(3.5, 0.)));
+  EXPECT_FALSE(obb.isInside(center + rotation * Eigen::Vector2d(0., -2.2)));
+
+  romea::core::AxisAlignedBoundingBox2d aabb = obb.toAxisAlignedBoundingBox();
+  EXPECT_DOUBLE_EQ(aabb.getCenterPosition().x(), center.x());
+  EXPECT_DOUBLE_EQ(aabb.getCenterPosition().y(), center.y());
+  EXPECT_NEAR(aabb.getHalfWidthExtents().x(), halfWidthExtents.y(), 1e-12);
+  EXPECT_NEAR(aabb.getHalfWidthExtents().y(), halfWidthExtents.x(), 1e-12);
 }
 
 //-----------------------------------------------------------------------------

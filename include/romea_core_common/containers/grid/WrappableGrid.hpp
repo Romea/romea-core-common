@@ -255,7 +255,7 @@ void WrappableGrid<T, DIM>::translate(
         zIndex = (zIndex + 1) % numberOfCellsAlongZAxis;
       }
 
-      for (int zOffset = 0; zOffset < indexOffsetAlongZAxis; zOffset++) {
+      for (int zOffset = 0; zOffset > indexOffsetAlongZAxis; zOffset--) {
         zIndex = (zIndex + numberOfCellsAlongZAxisMinusOne) % numberOfCellsAlongZAxis;
 
         for (yIndex = 0; yIndex < numberOfCellsAlongYAxis; yIndex++) {
