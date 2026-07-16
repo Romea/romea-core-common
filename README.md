@@ -1,19 +1,153 @@
-# romea_core_common #
+# romea_core_common
 
-This project is a C++ library that provides versatile collection of tools designed to support the ROMEA robotic ecosystem. It offers a range of utilities for various functionalities:
+`romea_core_common` is a modular C++ library providing the low-level building blocks used across the ROMEA robotics ecosystem.
 
-- **Geodesy Conversions:**
-  Tools for accurate transformations between different geodetic coordinate systems, ensuring precise location data.
-- **Diagnostics, Monitoring, and Logging:**
-  Features that facilitate system health monitoring, event logging, and issue diagnosis, enhancing reliability and performance.
-- **Mathematics, Geometry, and Optimization:**
-  A comprehensive suite of mathematical and geometric functions, including optimization techniques such as least squares, Newton's method, and Iterative Closest Point (ICP) algorithms.
-- **Point Cloud Processing:**
-  Utilities for managing and processing point clouds, including structures for KD-trees, grids, and bounding boxes, to facilitate spatial data analysis.
-- **Time Management:**
-  Tools designed to handle time-related tasks, improving synchronization and scheduling within robotic applications.
+The package gathers reusable algorithms, mathematical utilities, geometric models, coordinate transformations, monitoring tools, and spatial data structures commonly required in robotics software development.
 
-## **Usage**
+It is designed for:
+
+- robotics research and experimentation,
+- real-time robotic applications,
+- ROS1 and ROS2 integration,
+- reusable software architectures.
+
+---
+
+# Features
+
+## Geodesy & Coordinate Systems
+
+Utilities dedicated to geographic localization and coordinate manipulation:
+
+- WGS84 / UTM / ENU conversions
+- Geodetic frame transformations
+- Earth projection utilities
+- Local tangent plane computations
+- Pose and frame conversions
+
+Modules:
+- `geodesy`
+- `coordinates`
+- `transform`
+
+---
+
+## Geometry & Mathematics
+
+Core mathematical and geometric algorithms for robotics applications:
+
+- 2D / 3D geometric primitives
+- Spatial transformations
+- Bounding boxes
+- Linear algebra helpers
+- Numerical optimization
+- Newton-based solvers
+- Signal filtering and interpolation
+
+Modules:
+- `geometry`
+- `math`
+- `signal`
+
+---
+
+## Regression & Estimation
+
+Robust estimation and optimization methods:
+
+- Least squares estimation
+- RANSAC-based fitting
+- Iterative Closest Point (ICP)
+- Transformation estimation
+
+Modules:
+- `regression`
+- `transform/estimation`
+
+---
+
+## Point Set & Spatial Processing
+
+Efficient data structures and algorithms for spatial analysis:
+
+- KD-tree implementation
+- Grid containers
+- Point set utilities
+- Spatial indexing
+- Nearest-neighbor search
+
+Modules:
+- `pointset`
+- `containers/grid`
+- `containers/boundingbox`
+
+---
+
+## Control & Robotics Utilities
+
+Reusable robotics-oriented helper functions:
+
+- Motion control utilities
+- Frame manipulation
+- State handling
+- Synchronization helpers
+
+Modules:
+- `control`
+- `time`
+
+---
+
+## Diagnostics, Monitoring & Logging
+
+Infrastructure for robust robotic applications:
+
+- Runtime diagnostics
+- Health monitoring
+- Logging utilities
+- Performance monitoring
+- Debug support
+
+Modules:
+- `diagnostic`
+- `monitoring`
+- `log`
+
+---
+
+## Generic Utilities
+
+Additional reusable components:
+
+- Thread-safe utilities
+- Concurrency helpers
+- Generic containers
+- Lexical conversions
+
+Modules:
+- `concurrency`
+- `containers`
+- `lexical`
+
+---
+
+# Dependencies
+
+The library relies on standard modern C++ tooling and integrates naturally within ROS ecosystems.
+
+Main dependencies typically include:
+
+- C++17
+- Eigen
+- ROS1 or ROS2 build tools
+- CMake
+
+Additional dependencies may be required depending on enabled modules.
+
+
+---
+
+# **Usage**
 
 1. create a ROS workspace
 2. cd worskpace
@@ -25,7 +159,7 @@ This project is a C++ library that provides versatile collection of tools design
    - colcon build for ROS2
 7. create your application using this library
 
-## **Contributing**
+# **Contributing**
 
 If you'd like to contribute to this project, here are some guidelines:
 
@@ -38,14 +172,14 @@ If you'd like to contribute to this project, here are some guidelines:
 7. Push your changes to your forked repository.
 8. Submit a pull request.
 
-## **License**
+# **License**
 
 This project is released under the Apache License 2.0. See the LICENSE file for details.
 
-## **Authors**
+# **Authors**
 
 The romea_core_common library was developed by **Jean Laneurit** in the context of various research projects carried out at INRAE.
 
-## **Contact**
+# **Contact**
 
 If you have any questions or comments about romea_core_common library, please contact **[Jean Laneurit](mailto:jean.laneurit@inrae.fr)** 
