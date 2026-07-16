@@ -1,4 +1,5 @@
-// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Copyright 2022 INRAE, French National Research Institute for Agriculture,
+// Food and Environment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,52 +13,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef ROMEA_CORE_COMMON__REGRESSION__LEASTSQUARES__NLSE_HPP_
 #define ROMEA_CORE_COMMON__REGRESSION__LEASTSQUARES__NLSE_HPP_
 
 #include "romea_core_common/regression/leastsquares/LeastSquares.hpp"
 
-namespace romea
-{
-namespace core
-{
+namespace romea {
+namespace core {
 
-template<typename RealType>
-class NLSE
-{
-public:
+template <typename RealType>
+class NLSE {
+ public:
   using Vector = Eigen::Matrix<RealType, Eigen::Dynamic, 1>;
   using Matrix = Eigen::Matrix<RealType, Eigen::Dynamic, Eigen::Dynamic>;
 
-public:
+ public:
   NLSE();
 
-  explicit NLSE(const double & estimateEpsilon);
+  explicit NLSE(const double& estimateEpsilon);
 
-  NLSE(const double & estimateEpsilon, const RealType & alpha);
+  NLSE(const double& estimateEpsilon, const RealType& alpha);
 
   virtual ~NLSE() = default;
 
-public:
-  virtual bool estimate(
-    const size_t & maximalNumberOfIterations,
-    const double & dataStd);
+ public:
+  virtual bool estimate(const size_t& maximalNumberOfIterations,
+                        const double& dataStd);
 
-  const size_t & getNumberOfIterations();
+  const size_t& getNumberOfIterations();
 
-  const double & getRootMeanSquareError();
+  const double& getRootMeanSquareError();
 
-  const Vector & getEstimate();
+  const Vector& getEstimate();
 
-  const Matrix & getEstimateCovariance();
+  const Matrix& getEstimateCovariance();
 
-protected:
+ protected:
   virtual void computeGuess_() = 0;
 
   virtual void computeJacobianAndY_() = 0;
 
-protected:
+ protected:
   double alpha_;
   Vector estimate_;
   Vector estimateDelta_;

@@ -1,4 +1,5 @@
-// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Copyright 2022 INRAE, French National Research Institute for Agriculture,
+// Food and Environment
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,52 +13,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include "romea_core_common/regression/leastsquares/NLSE.hpp"
 
-namespace
-{
+namespace {
 const double DEFAULT_ALPHA = 0.7;
 const double DEFAULT_ESTIMATE_EPSILON = 0.01;
-}
+}  // namespace
 
-namespace romea
-{
-namespace core
-{
+namespace romea {
+namespace core {
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-NLSE<RealType>::NLSE()
-: NLSE(DEFAULT_ESTIMATE_EPSILON, DEFAULT_ALPHA)
-{
-}
+template <typename RealType>
+NLSE<RealType>::NLSE() : NLSE(DEFAULT_ESTIMATE_EPSILON, DEFAULT_ALPHA) {}
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-NLSE<RealType>::NLSE(const double & estimateEpsilon)
-: NLSE(estimateEpsilon, DEFAULT_ALPHA)
-{
-}
+template <typename RealType>
+NLSE<RealType>::NLSE(const double& estimateEpsilon)
+    : NLSE(estimateEpsilon, DEFAULT_ALPHA) {}
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-NLSE<RealType>::NLSE(const double & estimateEpsilon, const RealType & alpha)
-: alpha_(alpha),
-  estimate_(),
-  estimateDelta_(),
-  estimateCovariance_(),
-  estimateEpsilon_(estimateEpsilon),
-  numberOfIterations_(0),
-  leastSquares_(),
-  rmse_(-1)
-{
-}
+template <typename RealType>
+NLSE<RealType>::NLSE(const double& estimateEpsilon, const RealType& alpha)
+    : alpha_(alpha),
+      estimate_(),
+      estimateDelta_(),
+      estimateCovariance_(),
+      estimateEpsilon_(estimateEpsilon),
+      numberOfIterations_(0),
+      leastSquares_(),
+      rmse_(-1) {}
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-bool NLSE<RealType>::estimate(const size_t & maximalNumberOfIterations, const double & dataStd)
-{
+template <typename RealType>
+bool NLSE<RealType>::estimate(const size_t& maximalNumberOfIterations,
+                              const double& dataStd) {
   computeGuess_();
   numberOfIterations_ = 0;
   rmse_ = -1;
@@ -107,30 +97,26 @@ bool NLSE<RealType>::estimate(const size_t & maximalNumberOfIterations, const do
 }
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-const size_t & NLSE<RealType>::getNumberOfIterations()
-{
+template <typename RealType>
+const size_t& NLSE<RealType>::getNumberOfIterations() {
   return numberOfIterations_;
 }
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-const double & NLSE<RealType>::getRootMeanSquareError()
-{
+template <typename RealType>
+const double& NLSE<RealType>::getRootMeanSquareError() {
   return rmse_;
 }
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-const typename NLSE<RealType>::Vector & NLSE<RealType>::getEstimate()
-{
+template <typename RealType>
+const typename NLSE<RealType>::Vector& NLSE<RealType>::getEstimate() {
   return estimate_;
 }
 
 //-----------------------------------------------------------------------------
-template<typename RealType>
-const typename NLSE<RealType>::Matrix & NLSE<RealType>::getEstimateCovariance()
-{
+template <typename RealType>
+const typename NLSE<RealType>::Matrix& NLSE<RealType>::getEstimateCovariance() {
   return estimateCovariance_;
 }
 
