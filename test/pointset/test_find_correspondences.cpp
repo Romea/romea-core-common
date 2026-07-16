@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 // std
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -29,8 +30,8 @@ template<class PointType>
 size_t findCorrespondences(const std::string & dataFileName)
 {
   // load data
-  romea::core::PointSet<Eigen::Vector2d> pointSet = loadScan<Eigen::Vector2d>(dataFileName);
-  romea::core::KdTree<Eigen::Vector2d> kdTree(pointSet);
+  romea::core::PointSet<PointType> pointSet = loadScan<PointType>(dataFileName);
+  romea::core::KdTree<PointType> kdTree(pointSet);
 
   // Search nearest point;
   size_t nearestIndex;
@@ -65,9 +66,75 @@ TEST(TestFindCorrespondences, find2DCorrespondences)
 }
 
 //-----------------------------------------------------------------------------
+TEST(TestKdTree, findNearestNeighbor2D)
+{
+  romea::core::PointSet<Eigen::Vector2d> pointSet = {
+    Eigen::Vector2d(0., 0.),
+    Eigen::Vector2d(2., 0.),
+    Eigen::Vector2d(0., 3.),
+    Eigen::Vector2d(5., 5.)};
+  romea::core::KdTree<Eigen::Vector2d> kdTree(pointSet);
+
+  size_t nearestIndex = pointSet.size();
+  double nearestNeighborSquareDistance = -1.;
+  kdTree.findNearestNeighbor(Eigen::Vector2d(1.8, 0.1), nearestIndex, nearestNeighborSquareDistance);
+
+  EXPECT_EQ(nearestIndex, 1u);
+  EXPECT_NEAR(nearestNeighborSquareDistance, 0.05, 1e-12);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestKdTree, findNearestNeighbors3D)
+{
+  romea::core::PointSet<Eigen::Vector3d> pointSet = {
+    Eigen::Vector3d(0., 0., 0.),
+    Eigen::Vector3d(1., 0., 0.),
+    Eigen::Vector3d(0., 1., 0.),
+    Eigen::Vector3d(0., 0., 2.)};
+  romea::core::KdTree<Eigen::Vector3d> kdTree(pointSet);
+
+  std::vector<size_t> nearestIndexes(2);
+  std::vector<double> nearestNeighborSquareDistances(2);
+  kdTree.findNearestNeighbors(
+    Eigen::Vector3d(0., 0., 0.1),
+    2,
+    nearestIndexes,
+    nearestNeighborSquareDistances);
+
+  EXPECT_EQ(nearestIndexes[0], 0u);
+  EXPECT_NEAR(nearestNeighborSquareDistances[0], 0.01, 1e-12);
+  EXPECT_NE(
+    std::find(nearestIndexes.begin(), nearestIndexes.end(), 1u),
+    nearestIndexes.end());
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestKdTree, radiusResearchReturnsNeighborsInsideSquaredRadius)
+{
+  romea::core::PointSet<Eigen::Vector2d> pointSet = {
+    Eigen::Vector2d(0., 0.),
+    Eigen::Vector2d(0.5, 0.),
+    Eigen::Vector2d(0., 0.75),
+    Eigen::Vector2d(2., 0.)};
+  romea::core::KdTree<Eigen::Vector2d> kdTree(pointSet);
+
+  std::vector<size_t> neighborIndexes;
+  std::vector<double> neighborSquareDistances;
+  kdTree.radiusResearch(
+    Eigen::Vector2d(0., 0.),
+    1.,
+    neighborIndexes,
+    neighborSquareDistances);
+
+  std::sort(neighborIndexes.begin(), neighborIndexes.end());
+  EXPECT_EQ(neighborIndexes, std::vector<size_t>({0u, 1u, 2u}));
+  EXPECT_EQ(neighborSquareDistances.size(), 3u);
+}
+
+//-----------------------------------------------------------------------------
 TEST(TestFindCorrespondences, find3DCorrespondences)
 {
-  EXPECT_EQ(99426, findCorrespondences<Eigen::Vector3d>("/scan3d.txt"));
+  EXPECT_EQ(66332, findCorrespondences<Eigen::Vector3d>("/scan3d.txt"));
 }
 
 //-----------------------------------------------------------------------------

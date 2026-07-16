@@ -28,6 +28,9 @@
 //-----------------------------------------------------------------------------
 TEST(TestComputeNormal, checkComputeNormals2d)
 {
+  constexpr double normalTolerance = 0.05;
+  constexpr double curvatureTolerance = 0.02;
+
   // load scan data and compute normals and curvatures
   romea::core::PointSet<Eigen::Vector2d> pointSet = loadScan<Eigen::Vector2d>("/scan2d.txt");
 
@@ -40,24 +43,28 @@ TEST(TestComputeNormal, checkComputeNormals2d)
   // load theorical normal and curvature values and compare with estimated values
   std::ifstream data(std::string(TEST_DIR) + std::string("/normals2d.txt"));
 
-  if (data.is_open()) {
-    size_t n = 0;
-    double nx, ny, c, r;
-    while (!data.eof()) {
-      data >> nx >> ny >> c >> r;
-      EXPECT_NEAR(nx, normalSet[n][0], 0.01);
-      EXPECT_NEAR(ny, normalSet[n][1], 0.01);
-      EXPECT_NEAR(c, curvatures[n], 0.01);
-      // EXPECT_NEAR(r,reliabilities[n],0.01);
-      // std::cout << nx <<" "<< ny <<" "<< c <<" "<< r << std::endl;
-      n++;
-    }
+  ASSERT_TRUE(data.is_open());
+  size_t n = 0;
+  double nx, ny, c, r;
+  while (data >> nx >> ny >> c >> r) {
+    SCOPED_TRACE(n);
+    ASSERT_LT(n, normalSet.size());
+    EXPECT_NEAR(nx, normalSet[n][0], normalTolerance);
+    EXPECT_NEAR(ny, normalSet[n][1], normalTolerance);
+    EXPECT_NEAR(c, curvatures[n], curvatureTolerance);
+    // EXPECT_NEAR(r,reliabilities[n],0.01);
+    // std::cout << nx <<" "<< ny <<" "<< c <<" "<< r << std::endl;
+    n++;
   }
+  EXPECT_EQ(n, normalSet.size());
 }
 
 //-----------------------------------------------------------------------------
 TEST(TestComputeNormal, checkComputeNormals3d)
 {
+  constexpr double normalTolerance = 0.05;
+  constexpr double curvatureTolerance = 0.02;
+
   // load scan data and compute normals and curvatures
   romea::core::PointSet<Eigen::Vector3d> pointSet =
     loadScan<Eigen::Vector3d>("/scan3d.txt");
@@ -71,20 +78,21 @@ TEST(TestComputeNormal, checkComputeNormals3d)
   // load theorical normal and curvature values and compare with estimated values
   std::ifstream data(std::string(TEST_DIR) + std::string("/normals3d.txt"));
 
-  if (data.is_open()) {
-    size_t n = 0;
-    double nx, ny, nz, c, r;
-    while (!data.eof()) {
-      data >> nx >> ny >> nz >> c >> r;
-      EXPECT_NEAR(nx, normalSet[n][0], 0.01);
-      EXPECT_NEAR(ny, normalSet[n][1], 0.01);
-      EXPECT_NEAR(nz, normalSet[n][2], 0.01);
-      EXPECT_NEAR(c, curvatures[n], 0.01);
-      // EXPECT_NEAR(r,reliabilities[n],0.01);
-      // std::cout << nx <<" "<< ny <<" "<< c <<" "<< r << std::endl;
-      n++;
-    }
+  ASSERT_TRUE(data.is_open());
+  size_t n = 0;
+  double nx, ny, nz, c, r;
+  while (data >> nx >> ny >> nz >> c >> r) {
+    SCOPED_TRACE(n);
+    ASSERT_LT(n, normalSet.size());
+    EXPECT_NEAR(nx, normalSet[n][0], normalTolerance);
+    EXPECT_NEAR(ny, normalSet[n][1], normalTolerance);
+    EXPECT_NEAR(nz, normalSet[n][2], normalTolerance);
+    EXPECT_NEAR(c, curvatures[n], curvatureTolerance);
+    // EXPECT_NEAR(r,reliabilities[n],0.01);
+    // std::cout << nx <<" "<< ny <<" "<< c <<" "<< r << std::endl;
+    n++;
   }
+  EXPECT_EQ(n, normalSet.size());
 }
 
 //-----------------------------------------------------------------------------

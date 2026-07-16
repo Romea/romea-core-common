@@ -37,15 +37,13 @@ loadScan(const std::string & filename)
   if (romea::core::PointTraits<PointType>::DIM == 2) {
     PointType p;
     scan.reserve(1081);
-    while (!data.eof()) {
-      data >> p[0] >> p[1];
+    while (data >> p[0] >> p[1]) {
       scan.push_back(p);
     }
   } else {
     PointType p;
     scan.reserve(100000);
-    while (!data.eof()) {
-      data >> p[0] >> p[1] >> p[2];
+    while (data >> p[0] >> p[1] >> p[2]) {
       scan.push_back(p);
     }
   }
