@@ -70,6 +70,36 @@ Eigen::Matrix6d computeNumericalJacobian(
   return jacobian;
 }
 
+//-----------------------------------------------------------------------------
+void checkPoseTransform(
+  const Eigen::Isometry3d & isometry,
+  const romea::core::Pose3D & pose3d)
+{
+  romea::core::Pose3D transformed = isometry * pose3d;
+  Eigen::Matrix3d expectedRotation =
+    isometry.rotation() * romea::core::eulerAnglesToRotation3D(pose3d.orientation);
+
+  romea::core::Pose3D expected;
+  expected.position = isometry.rotation() * pose3d.position + isometry.translation();
+  expected.orientation = romea::core::rotation3DToEulerAngles(expectedRotation);
+
+  EXPECT_TRUE(transformed.position.isApprox(expected.position, 1e-12));
+  EXPECT_TRUE(normalizedDifference(transformed, expected).tail<3>().isZero(1e-12));
+}
+
+//-----------------------------------------------------------------------------
+void checkCovarianceTransform(
+  const Eigen::Isometry3d & isometry,
+  const romea::core::Pose3D & pose3d)
+{
+  romea::core::Pose3D transformed = isometry * pose3d;
+  Eigen::Matrix6d numericalJacobian = computeNumericalJacobian(isometry, pose3d);
+  Eigen::Matrix6d expectedCovariance =
+    numericalJacobian * pose3d.covariance * numericalJacobian.transpose();
+
+  EXPECT_TRUE(transformed.covariance.isApprox(expectedCovariance, 1e-5));
+}
+
 }  // namespace
 
 //-----------------------------------------------------------------------------
@@ -173,6 +203,52 @@ TEST(TestPose3D, checkTranslationTransform)
 }
 
 //-----------------------------------------------------------------------------
+TEST(TestPose3D, checkRotationTransform)
+{
+  romea::core::Pose3D pose3d;
+  pose3d.position << 1, 2, 3;
+  pose3d.orientation << 0.2, -0.3, 0.4;
+
+  Eigen::Isometry3d isometry = Eigen::Isometry3d::Identity();
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(0.1, 0.2, -0.1));
+
+  checkPoseTransform(isometry, pose3d);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestPose3D, checkTransformForSeveralPoses)
+{
+  Eigen::Isometry3d isometry = Eigen::Isometry3d::Identity();
+  isometry.translation() << 4, -5, 6;
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(0.3, -0.2, 0.1));
+
+  romea::core::Pose3D pose3d;
+  pose3d.position << 1, 2, 3;
+  pose3d.orientation << 0.2, -0.3, 0.4;
+  checkPoseTransform(isometry, pose3d);
+
+  pose3d.position << -3, 0.5, 2;
+  pose3d.orientation << -0.1, 0.2, -0.3;
+  checkPoseTransform(isometry, pose3d);
+
+  pose3d.position << 0, -2, 1;
+  pose3d.orientation << M_PI / 2, -M_PI / 4, M_PI / 6;
+  checkPoseTransform(isometry, pose3d);
+
+  pose3d.position << 0, 0, 0;
+  pose3d.orientation << -M_PI / 3, M_PI / 5, -M_PI / 7;
+  checkPoseTransform(isometry, pose3d);
+
+  pose3d.position << 10, -20, 30;
+  pose3d.orientation << 0.01, -0.02, 0.03;
+  checkPoseTransform(isometry, pose3d);
+
+  pose3d.position << -0.5, -1.5, -2.5;
+  pose3d.orientation << -0.4, 0.5, -0.6;
+  checkPoseTransform(isometry, pose3d);
+}
+
+//-----------------------------------------------------------------------------
 TEST(TestPose3D, checkTransformCovarianceWithNumericalJacobian)
 {
   romea::core::Pose3D pose3d;
@@ -189,12 +265,68 @@ TEST(TestPose3D, checkTransformCovarianceWithNumericalJacobian)
   isometry.translation() << 4, 5, 6;
   isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(0.1, 0.2, -0.1));
 
-  romea::core::Pose3D transformed = isometry * pose3d;
-  Eigen::Matrix6d numericalJacobian = computeNumericalJacobian(isometry, pose3d);
-  Eigen::Matrix6d expectedCovariance =
-    numericalJacobian * pose3d.covariance * numericalJacobian.transpose();
+  checkCovarianceTransform(isometry, pose3d);
+}
 
-  EXPECT_TRUE(transformed.covariance.isApprox(expectedCovariance, 1e-5));
+//-----------------------------------------------------------------------------
+TEST(TestPose3D, checkTransformCovarianceForSeveralPoses)
+{
+  romea::core::Pose3D pose3d;
+  pose3d.position << -1, 2, -3;
+  pose3d.orientation << -0.2, 0.3, -0.4;
+  pose3d.covariance = Eigen::Matrix6d::Zero();
+  pose3d.covariance.diagonal() << 0.5, 1.5, 2.5, 0.04, 0.05, 0.06;
+  pose3d.covariance(0, 2) = -0.2;
+  pose3d.covariance(2, 0) = -0.2;
+  pose3d.covariance(3, 4) = 0.003;
+  pose3d.covariance(4, 3) = 0.003;
+
+  Eigen::Isometry3d isometry = Eigen::Isometry3d::Identity();
+  isometry.translation() << 1, -2, 3;
+
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(0.1, 0.2, 0.3));
+  checkCovarianceTransform(isometry, pose3d);
+
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(-0.2, 0.1, -0.4));
+  checkCovarianceTransform(isometry, pose3d);
+
+  pose3d.orientation << 0.3, -0.2, 0.1;
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(M_PI / 6, -M_PI / 8, M_PI / 5));
+  checkCovarianceTransform(isometry, pose3d);
+
+  pose3d.position << 0, 0, 0;
+  pose3d.orientation << 0.01, -0.02, 0.03;
+  pose3d.covariance = Eigen::Matrix6d::Identity() * 1e-4;
+  isometry.translation() << -4, 5, -6;
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(-0.05, 0.04, -0.03));
+  checkCovarianceTransform(isometry, pose3d);
+
+  pose3d.position << 10, -20, 30;
+  pose3d.orientation << -0.5, 0.4, -0.3;
+  pose3d.covariance = Eigen::Matrix6d::Zero();
+  pose3d.covariance.diagonal() << 10, 20, 30, 0.1, 0.2, 0.3;
+  pose3d.covariance(0, 1) = 2;
+  pose3d.covariance(1, 0) = 2;
+  pose3d.covariance(1, 2) = -3;
+  pose3d.covariance(2, 1) = -3;
+  pose3d.covariance(3, 5) = -0.02;
+  pose3d.covariance(5, 3) = -0.02;
+  isometry.translation() << 7, -8, 9;
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(0.4, -0.3, 0.2));
+  checkCovarianceTransform(isometry, pose3d);
+
+  pose3d.position << -0.5, -1.5, -2.5;
+  pose3d.orientation << M_PI / 3, -M_PI / 5, M_PI / 7;
+  pose3d.covariance = Eigen::Matrix6d::Zero();
+  pose3d.covariance.diagonal() << 0.2, 0.3, 0.4, 0.005, 0.006, 0.007;
+  pose3d.covariance(0, 3) = 0.01;
+  pose3d.covariance(3, 0) = 0.01;
+  pose3d.covariance(2, 5) = -0.015;
+  pose3d.covariance(5, 2) = -0.015;
+  isometry.translation() << -1, -2, -3;
+  isometry.linear() = romea::core::eulerAnglesToRotation3D(Eigen::Vector3d(-M_PI / 8, M_PI / 9, -M_PI / 10));
+  checkCovarianceTransform(isometry, pose3d);
+
 }
 
 //-----------------------------------------------------------------------------
