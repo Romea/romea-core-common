@@ -47,7 +47,7 @@ void toPosition3D(const Pose3D & pose3d, Position3D & position3d);
 
 std::ostream & operator<<(std::ostream & os, const Pose3D & pose3D);
 
-Pose3D operator*(const Eigen::Affine3d & affine, const Pose3D & pose3d);
+Pose3D operator*(const Eigen::Isometry3d & isometry, const Pose3D & pose3d);
 
 }  // namespace core
 }  // namespace romea

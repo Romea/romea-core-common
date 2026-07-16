@@ -1,9 +1,11 @@
-add_executable(${PROJECT_NAME}_test_geometry_pose2d test_geometry_pose2d.cpp )
-target_link_libraries(${PROJECT_NAME}_test_geometry_pose2d ${PROJECT_NAME} GTest::GTest GTest::Main)
-target_compile_options(${PROJECT_NAME}_test_geometry_pose2d PRIVATE -std=c++17)
-add_test(test_geometry_pose2d ${PROJECT_NAME}_test_geometry_pose2d)
+romea_add_gtest(test_geometry_pose2d test_geometry_pose2d.cpp LIBRARIES ${PROJECT_NAME})
 
-add_executable(${PROJECT_NAME}_test_geometry_pose3d test_geometry_pose3d.cpp )
-target_link_libraries(${PROJECT_NAME}_test_geometry_pose3d ${PROJECT_NAME} GTest::GTest GTest::Main)
-target_compile_options(${PROJECT_NAME}_test_geometry_pose3d PRIVATE -std=c++17)
-add_test(test_geometry_pose3d ${PROJECT_NAME}_test_geometry_pose3d)
+romea_add_gtest(test_geometry_pose3d test_geometry_pose3d.cpp LIBRARIES ${PROJECT_NAME})
+
+romea_add_gtest(test_geometry_position test_geometry_position.cpp LIBRARIES ${PROJECT_NAME})
+
+romea_add_gtest(test_geometry_pose_and_twist test_geometry_pose_and_twist.cpp LIBRARIES ${PROJECT_NAME})
+
+romea_add_gtest(test_geometry_shapes test_geometry_shapes.cpp LIBRARIES ${PROJECT_NAME})
+
+romea_add_gtest(test_geometry_twist test_geometry_twist.cpp LIBRARIES ${PROJECT_NAME})
