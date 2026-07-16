@@ -15,9 +15,6 @@
 #ifndef ROMEA_CORE_COMMON__MATH__MATRIX_HPP_
 #define ROMEA_CORE_COMMON__MATH__MATRIX_HPP_
 
-// std
-#include <iostream>
-
 // Eigen
 #include "Eigen/Core"
 
@@ -50,12 +47,10 @@ bool isPositiveSemiDefiniteMatrix(const MatrixType & matrix)
     for (int j = i; j < matrix.cols(); ++j) {
       if (i == j) {
         if (matrix(i, j) < 0) {
-          std::cout << matrix << std::endl;
           return false;
         }
       } else {
         if (!near(matrix(i, j), matrix(j, i), 0.000001)) {
-          std::cout << matrix << std::endl;
           return false;
         }
       }

@@ -20,6 +20,31 @@
 #include "romea_core_common/math/EulerAngles.hpp"
 
 //-----------------------------------------------------------------------------
+TEST(TestEuler, angleWrapping)
+{
+  EXPECT_DOUBLE_EQ(romea::core::between0And2Pi(0.), 0.);
+  EXPECT_DOUBLE_EQ(romea::core::between0And2Pi(-0.5), romea::core::M_2PI - 0.5);
+  EXPECT_DOUBLE_EQ(romea::core::between0And2Pi(romea::core::M_2PI + 0.5), 0.5);
+
+  EXPECT_DOUBLE_EQ(romea::core::betweenMinusPiAndPi(0.), 0.);
+  EXPECT_DOUBLE_EQ(romea::core::betweenMinusPiAndPi(M_PI + 0.5), -M_PI + 0.5);
+  EXPECT_DOUBLE_EQ(romea::core::betweenMinusPiAndPi(-M_PI - 0.5), M_PI - 0.5);
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestEuler, rotation2DConversion)
+{
+  const double yaw = 1.2;
+  const Eigen::Matrix2d rotation = romea::core::eulerAngleToRotation2D(yaw);
+
+  EXPECT_NEAR(rotation(0, 0), std::cos(yaw), 1e-12);
+  EXPECT_NEAR(rotation(0, 1), -std::sin(yaw), 1e-12);
+  EXPECT_NEAR(rotation(1, 0), std::sin(yaw), 1e-12);
+  EXPECT_NEAR(rotation(1, 1), std::cos(yaw), 1e-12);
+  EXPECT_NEAR(romea::core::rotation2DToEulerAngle(rotation), yaw, 1e-12);
+}
+
+//-----------------------------------------------------------------------------
 TEST(TestEuler, testRX)
 {
   double roll = 0.8;

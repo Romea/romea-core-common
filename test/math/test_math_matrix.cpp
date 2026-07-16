@@ -23,6 +23,10 @@
 //-----------------------------------------------------------------------------
 TEST(TestMatrix, testPositiveSemiDefiniteMatrix)
 {
+  Eigen::Matrix<double, 2, 3> nonSquareMatrix;
+  nonSquareMatrix.setZero();
+  EXPECT_FALSE(romea::core::isPositiveSemiDefiniteMatrix(nonSquareMatrix));
+
   Eigen::Matrix3d se2Covariance;
   se2Covariance.row(0) << 0.1, 0.3, -0.4;
   se2Covariance.row(1) << 0.3, 0.2, 0.3;

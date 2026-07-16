@@ -33,10 +33,9 @@ TEST(TestTransformation, makeRigidTransformation)
   EXPECT_DOUBLE_EQ(H.translation()(1),2.0);
   EXPECT_DOUBLE_EQ(H.translation()(2),3.0);
 
-  auto I = romea::core::eulerAnglesToRotation3D(rpy).inverse()*H.rotation();
-  EXPECT_DOUBLE_EQ(I(0,0),1.0);
-  EXPECT_DOUBLE_EQ(I(1,1),1.0);
-  EXPECT_DOUBLE_EQ(I(2,2),1.0);
+  Eigen::Matrix3d expectedRotation = romea::core::eulerAnglesToRotation3D(rpy);
+  EXPECT_TRUE(H.rotation().isApprox(expectedRotation, 1e-12));
+  EXPECT_TRUE((expectedRotation.inverse() * H.rotation()).isApprox(Eigen::Matrix3d::Identity(), 1e-12));
 
 
 }

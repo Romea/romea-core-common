@@ -33,6 +33,9 @@ TEST(TestAlgorithm, testClamp)
   EXPECT_DOUBLE_EQ(romea::core::clamp(0.5, -1., 1.), 0.5);
   EXPECT_DOUBLE_EQ(romea::core::clamp(1.5, -1., 1.), 1.);
   EXPECT_DOUBLE_EQ(romea::core::clamp(-1.5, -1., 1.), -1.);
+  EXPECT_THROW(
+    romea::core::clamp(std::numeric_limits<double>::quiet_NaN(), -1., 1.),
+    std::runtime_error);
 }
 
 //-----------------------------------------------------------------------------
@@ -76,6 +79,21 @@ TEST(TestAlgorithm, testIsApproximatelyEqual)
   EXPECT_EQ(true, romea::core::isApproximatelyEqual(1.0, 2.0 / 2.0));
   EXPECT_EQ(true, romea::core::isApproximatelyEqual(1000.0, 999.5, 1e-3));
   EXPECT_EQ(false, romea::core::isApproximatelyEqual(1000.0, 999.0, 1e-3));
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestAlgorithm, testNearUsesGivenEpsilon)
+{
+  EXPECT_TRUE(romea::core::near(1.0, 1.0 + 1e-6));
+  EXPECT_TRUE(romea::core::near(1.0, 1.0 + 1e-6, 1e-5));
+  EXPECT_FALSE(romea::core::near(1.0, 1.0 + 1e-6, 1e-7));
+}
+
+//-----------------------------------------------------------------------------
+TEST(TestAlgorithm, testIsApproximatelyZero)
+{
+  EXPECT_TRUE(romea::core::isApproximatelyZero(1e-8, 1e-7));
+  EXPECT_FALSE(romea::core::isApproximatelyZero(1e-6, 1e-7));
 }
 
 // TEST(TestAlgorithm,testDefinitelyGreaterThan)

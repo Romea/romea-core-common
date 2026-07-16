@@ -23,6 +23,7 @@
 #include <limits>
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 #include <sstream>
 
 namespace romea
@@ -61,12 +62,12 @@ double signedFloor(const RealType & x)
 
 //--------------------------------------------------------------------------
 template<typename RealType>
-RealType near(
+bool near(
   const RealType & value1,
   const RealType & value2,
-  double epsilon = std::numeric_limits<RealType>::epsilon())
+  const RealType & epsilon = RealType(0.00001))
 {
-  return std::abs(value1 - value2) < 0.00001;
+  return std::abs(value1 - value2) < epsilon;
 }
 
 // replace by std::clamp with c++17
