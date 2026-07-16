@@ -15,181 +15,133 @@
 
 // gtest
 #include <gtest/gtest.h>
+
+// romea
 #include <romea_core_common/transform/SmartRotation3D.hpp>
 
-const double a = 60 / 180. * M_PI;
-const double cosa = std::cos(60 / 180. * M_PI);
-const double sina = std::sin(60 / 180. * M_PI);
+namespace
+{
+
+const double angle = 60 / 180. * M_PI;
+const double cosAngle = std::cos(angle);
+const double sinAngle = std::sin(angle);
 const double eps = 0.0001;
 
 //-----------------------------------------------------------------------------
-TEST(testSmartRotation3D, check_roll_rotation)
+Eigen::Matrix3d computeNumericalDerivative(const Eigen::Vector3d & angles, int angleIndex)
 {
-  romea::core::SmartRotation3D rotation(a, 0, 0);
-  EXPECT_NEAR(rotation.R()(0, 0), 1.0, eps);
-  EXPECT_NEAR(rotation.R()(0, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(0, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(1, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(1, 1), cosa, eps);
-  EXPECT_NEAR(rotation.R()(1, 2), -sina, eps);
-  EXPECT_NEAR(rotation.R()(2, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(2, 1), sina, eps);
-  EXPECT_NEAR(rotation.R()(2, 2), cosa, eps);
+  constexpr double epsilon = 1e-6;
 
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(0, 0), 1.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(0, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(0, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(1, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(1, 1), -sina, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(1, 2), -cosa, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(2, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(2, 1), cosa, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(2, 2), -sina, eps);
+  Eigen::Vector3d forwardAngles = angles;
+  Eigen::Vector3d backwardAngles = angles;
+  forwardAngles(angleIndex) += epsilon;
+  backwardAngles(angleIndex) -= epsilon;
 
-  Eigen::Vector3d T(1, 2, 3);
-  Eigen::Vector3d RT = rotation * T;
-  EXPECT_NEAR(RT(0), 1.0, eps);
-  EXPECT_NEAR(RT(1), -1.5981, eps);
-  EXPECT_NEAR(RT(2), 3.2321, eps);
+  romea::core::SmartRotation3D forwardRotation(forwardAngles);
+  romea::core::SmartRotation3D backwardRotation(backwardAngles);
 
-  Eigen::Vector3d dRTdroll = rotation.dRTdAngles(T).col(0);
-  EXPECT_NEAR(dRTdroll(0), 1.0000, eps);
-  EXPECT_NEAR(dRTdroll(1), -3.2321, eps);
-  EXPECT_NEAR(dRTdroll(2), -1.5981, eps);
+  return (forwardRotation.R() - backwardRotation.R()) / (2 * epsilon);
 }
 
 //-----------------------------------------------------------------------------
-TEST(testSmartRotation3D, check_pitch_rotation)
+void checkDerivatives(const Eigen::Vector3d & angles)
 {
-  romea::core::SmartRotation3D rotation(0, a, 0);
-  EXPECT_NEAR(rotation.R()(0, 0), cosa, eps);
-  EXPECT_NEAR(rotation.R()(0, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(0, 2), sina, eps);
-  EXPECT_NEAR(rotation.R()(1, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(1, 1), 1.0, eps);
-  EXPECT_NEAR(rotation.R()(1, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(2, 0), -sina, eps);
-  EXPECT_NEAR(rotation.R()(2, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(2, 2), cosa, eps);
+  romea::core::SmartRotation3D rotation(angles);
 
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(0, 0), -sina, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(0, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(0, 2), cosa, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(1, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(1, 1), 1.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(1, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(2, 0), -cosa, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(2, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(2, 2), -sina, eps);
+  EXPECT_TRUE(rotation.dRdAngleAroundXAxis().isApprox(computeNumericalDerivative(angles, 0), eps));
+  EXPECT_TRUE(rotation.dRdAngleAroundYAxis().isApprox(computeNumericalDerivative(angles, 1), eps));
+  EXPECT_TRUE(rotation.dRdAngleAroundZAxis().isApprox(computeNumericalDerivative(angles, 2), eps));
 
-  Eigen::Vector3d T(1, 2, 3);
-  Eigen::Vector3d RT = rotation * T;
-  EXPECT_NEAR(RT(0), 3.0981, eps);
-  EXPECT_NEAR(RT(1), 2.0, eps);
-  EXPECT_NEAR(RT(2), 0.6340, eps);
+  Eigen::Vector3d vector(1, 2, 3);
+  Eigen::Matrix3d expectedDRTdAngles;
+  expectedDRTdAngles.col(0) = rotation.dRdAngleAroundXAxis() * vector;
+  expectedDRTdAngles.col(1) = rotation.dRdAngleAroundYAxis() * vector;
+  expectedDRTdAngles.col(2) = rotation.dRdAngleAroundZAxis() * vector;
 
-  Eigen::Vector3d dRTdpitch = rotation.dRTdAngles(T).col(1);
-  EXPECT_NEAR(dRTdpitch(0), 0.633975, eps);
-  EXPECT_NEAR(dRTdpitch(1), 2.0, eps);
-  EXPECT_NEAR(dRTdpitch(2), -3.098075, eps);
+  EXPECT_TRUE(rotation.dRTdAngles(vector).isApprox(expectedDRTdAngles, eps));
+}
+
+}  // namespace
+
+//-----------------------------------------------------------------------------
+TEST(testSmartRotation3D, checkRollRotation)
+{
+  romea::core::SmartRotation3D rotation(angle, 0, 0);
+
+  Eigen::Matrix3d expectedRotation;
+  expectedRotation << 1, 0, 0,
+    0, cosAngle, -sinAngle,
+    0, sinAngle, cosAngle;
+
+  EXPECT_TRUE(rotation.R().isApprox(expectedRotation, eps));
+  EXPECT_TRUE((rotation * Eigen::Vector3d(1, 2, 3)).isApprox(Eigen::Vector3d(1, -1.5981, 3.2321), eps));
+  checkDerivatives(Eigen::Vector3d(angle, 0, 0));
 }
 
 //-----------------------------------------------------------------------------
-TEST(testSmartRotation3D, check_yaw_rotation)
+TEST(testSmartRotation3D, checkPitchRotation)
 {
-  romea::core::SmartRotation3D rotation(0, 0, a);
-  EXPECT_NEAR(rotation.R()(0, 0), cosa, eps);
-  EXPECT_NEAR(rotation.R()(0, 1), -sina, eps);
-  EXPECT_NEAR(rotation.R()(0, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(1, 0), sina, eps);
-  EXPECT_NEAR(rotation.R()(1, 1), cosa, eps);
-  EXPECT_NEAR(rotation.R()(1, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(2, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(2, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.R()(2, 2), 1.0, eps);
+  romea::core::SmartRotation3D rotation(0, angle, 0);
 
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(0, 0), -sina, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(0, 1), -cosa, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(0, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(1, 0), cosa, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(1, 1), -sina, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(1, 2), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(2, 0), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(2, 1), 0.0, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(2, 2), 1.0, eps);
+  Eigen::Matrix3d expectedRotation;
+  expectedRotation << cosAngle, 0, sinAngle,
+    0, 1, 0,
+    -sinAngle, 0, cosAngle;
 
-  Eigen::Vector3d T(1, 2, 3);
-  Eigen::Vector3d RT = rotation * T;
-  EXPECT_NEAR(RT(0), -1.2321, eps);
-  EXPECT_NEAR(RT(1), 1.8660, eps);
-  EXPECT_NEAR(RT(2), 3.0, eps);
-
-  Eigen::Vector3d dRTdyaw = rotation.dRTdAngles(T).col(2);
-  EXPECT_NEAR(dRTdyaw(0), -1.866025, eps);
-  EXPECT_NEAR(dRTdyaw(1), -1.232050, eps);
-  EXPECT_NEAR(dRTdyaw(2), 3, eps);
+  EXPECT_TRUE(rotation.R().isApprox(expectedRotation, eps));
+  EXPECT_TRUE((rotation * Eigen::Vector3d(1, 2, 3)).isApprox(Eigen::Vector3d(3.0981, 2, 0.6340), eps));
+  checkDerivatives(Eigen::Vector3d(0, angle, 0));
 }
 
 //-----------------------------------------------------------------------------
-TEST(testSmartRotation3D, check_full_rotation)
+TEST(testSmartRotation3D, checkYawRotation)
 {
-  romea::core::SmartRotation3D rotation(a, a, a);
-  EXPECT_NEAR(rotation.R()(0, 0), 0.250000, eps);
-  EXPECT_NEAR(rotation.R()(0, 1), -0.058013, eps);
-  EXPECT_NEAR(rotation.R()(0, 2), 0.966506, eps);
-  EXPECT_NEAR(rotation.R()(1, 0), 0.433013, eps);
-  EXPECT_NEAR(rotation.R()(1, 1), 0.899519, eps);
-  EXPECT_NEAR(rotation.R()(1, 2), -0.058013, eps);
-  EXPECT_NEAR(rotation.R()(2, 0), -0.866025, eps);
-  EXPECT_NEAR(rotation.R()(2, 1), 0.433013, eps);
-  EXPECT_NEAR(rotation.R()(2, 2), 0.250000, eps);
+  romea::core::SmartRotation3D rotation(0, 0, angle);
 
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(0, 0), 0.25, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(0, 1), 0.966506, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(0, 2), 0.0580127, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(1, 0), 0.433013, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(1, 1), -0.0580127, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(1, 2), -0.899519, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(2, 0), -0.866025, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(2, 1), 0.25, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundXAxis()(2, 2), -0.433013, eps);
+  Eigen::Matrix3d expectedRotation;
+  expectedRotation << cosAngle, -sinAngle, 0,
+    sinAngle, cosAngle, 0,
+    0, 0, 1;
 
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(0, 0), -0.433013, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(0, 1), -0.216506, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(0, 2), 0.875, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(1, 0), -0.75, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(1, 1), 0.625, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(1, 2), -0.216506, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(2, 0), -0.5, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(2, 1), -0.75, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundYAxis()(2, 2), -0.433013, eps);
+  EXPECT_TRUE(rotation.R().isApprox(expectedRotation, eps));
+  EXPECT_TRUE((rotation * Eigen::Vector3d(1, 2, 3)).isApprox(Eigen::Vector3d(-1.2321, 1.8660, 3), eps));
+  checkDerivatives(Eigen::Vector3d(0, 0, angle));
+}
 
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(0, 0), -0.433013, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(0, 1), -0.899519, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(0, 2), 0.0580127, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(1, 0), 0.25, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(1, 1), -0.0580127, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(1, 2), 0.966506, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(2, 0), -0.866025, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(2, 1), 0.433013, eps);
-  EXPECT_NEAR(rotation.dRdAngleAroundZAxis()(2, 2), 0.25, eps);
+//-----------------------------------------------------------------------------
+TEST(testSmartRotation3D, checkFullRotation)
+{
+  romea::core::SmartRotation3D rotation(angle, angle, angle);
 
-  Eigen::Vector3d T(1, 2, 3);
-  Eigen::Vector3d RT = rotation * T;
-  EXPECT_NEAR(RT(0), 3.0335, eps);
-  EXPECT_NEAR(RT(1), 2.0580, eps);
-  EXPECT_NEAR(RT(2), 0.7500, eps);
+  Eigen::Matrix3d expectedRotation;
+  expectedRotation << 0.250000, -0.058013, 0.966506,
+    0.433013, 0.899519, -0.058013,
+    -0.866025, 0.433013, 0.250000;
 
-  Eigen::Matrix3d dRTdAngles = rotation.dRTdAngles(T);
-  EXPECT_NEAR(dRTdAngles(0, 0), 2.35705, eps);
-  EXPECT_NEAR(dRTdAngles(0, 1), 1.75897, eps);
-  EXPECT_NEAR(dRTdAngles(0, 2), -2.05801, eps);
-  EXPECT_NEAR(dRTdAngles(1, 0), -2.38157, eps);
-  EXPECT_NEAR(dRTdAngles(1, 1), -0.149519, eps);
-  EXPECT_NEAR(dRTdAngles(1, 2), 3.03349, eps);
-  EXPECT_NEAR(dRTdAngles(2, 0), -1.66506, eps);
-  EXPECT_NEAR(dRTdAngles(2, 1), -3.29904, eps);
-  EXPECT_NEAR(dRTdAngles(2, 2), 0.75, eps);
+  EXPECT_TRUE(rotation.R().isApprox(expectedRotation, eps));
+  EXPECT_TRUE((rotation * Eigen::Vector3d(1, 2, 3)).isApprox(Eigen::Vector3d(3.0335, 2.0580, 0.7500), eps));
+  checkDerivatives(Eigen::Vector3d(angle, angle, angle));
+}
+
+//-----------------------------------------------------------------------------
+TEST(testSmartRotation3D, checkDerivativesForSeveralRotations)
+{
+  checkDerivatives(Eigen::Vector3d(0, 0, 0));
+  checkDerivatives(Eigen::Vector3d(1e-6, -1e-6, 1e-6));
+  checkDerivatives(Eigen::Vector3d(0.01, -0.02, 0.03));
+  checkDerivatives(Eigen::Vector3d(-0.01, 0.02, -0.03));
+  checkDerivatives(Eigen::Vector3d(angle, 0, -angle));
+  checkDerivatives(Eigen::Vector3d(0, -angle, angle));
+  checkDerivatives(Eigen::Vector3d(-angle, angle, -angle));
+  checkDerivatives(Eigen::Vector3d(angle / 2, -angle / 3, angle / 4));
+  checkDerivatives(Eigen::Vector3d(-angle / 5, angle / 7, -angle / 9));
+  checkDerivatives(Eigen::Vector3d(2 * angle, -angle / 2, angle / 8));
+  checkDerivatives(Eigen::Vector3d(-M_PI / 2, M_PI / 3, -M_PI / 4));
+  checkDerivatives(Eigen::Vector3d(M_PI / 2, -M_PI / 3, M_PI / 4));
+  checkDerivatives(Eigen::Vector3d(-M_PI + 0.01, M_PI / 2 - 0.02, -M_PI / 6));
+  checkDerivatives(Eigen::Vector3d(M_PI - 0.01, -M_PI / 2 + 0.02, M_PI / 6));
+  checkDerivatives(Eigen::Vector3d(2 * M_PI, -2 * M_PI, M_PI));
+  checkDerivatives(Eigen::Vector3d(-2 * M_PI + 0.1, 2 * M_PI - 0.2, -M_PI + 0.3));
 }
 
 //-----------------------------------------------------------------------------

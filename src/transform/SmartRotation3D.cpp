@@ -67,6 +67,13 @@ void SmartRotation3D::init(
   double cosz = std::cos(angleAroundZAxis);
   double sinz = std::sin(angleAroundZAxis);
 
+  Rx_.setIdentity();
+  Ry_.setIdentity();
+  Rz_.setIdentity();
+  dRxdAngleX_.setZero();
+  dRydAngleY_.setZero();
+  dRzdAngleZ_.setZero();
+
   // Compute Rx
   Rx_(1, 1) = cosx;
   Rx_(1, 2) = -sinx;

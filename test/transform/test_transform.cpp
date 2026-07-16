@@ -84,22 +84,41 @@ TEST(TestTransform, FindByLeastSquaresWithoutPreconditionningh)
 }
 
 //-----------------------------------------------------------------------------
+template<class PointType>
+void testSVDWithoutPreconditionning(
+  const std::string & scanFileName,
+  const Eigen::Transform<typename PointType::Scalar,
+  romea::core::PointTraits<PointType>::DIM, Eigen::Affine> & transformation)
+{
+  romea::core::PointSet<PointType> sourcePoints = loadScan<PointType>(scanFileName);
+  romea::core::PointSet<PointType> targetPoints = projectScan(sourcePoints, transformation);
+  std::vector<romea::core::Correspondence> correspondences =
+    fakeCorrespondences(sourcePoints.size());
+
+  romea::core::FindRigidTransformationBySVD<PointType> estimator;
+  auto estimatedTransformation = estimator.find(
+    sourcePoints,
+    targetPoints,
+    correspondences);
+
+  EXPECT_NEAR(
+    romea::core::PointTraits<PointType>::DIM + 1,
+    (transformation.matrix().inverse() * estimatedTransformation).array().sum(), 0.01);
+}
+
+//-----------------------------------------------------------------------------
 TEST(TestTransform, FindBySVDWithoutPreconditionningc)
 {
-  testWithoutPreconditionning<romea::core::FindRigidTransformationByLeastSquares, Eigen::Vector2d>(
-    "/scan2d.txt", transformation2d);
-  testWithoutPreconditionning<romea::core::FindRigidTransformationByLeastSquares, Eigen::Vector3d>(
-    "/scan3d.txt", transformation3d);
+  testSVDWithoutPreconditionning<Eigen::Vector2d>("/scan2d.txt", transformation2d);
+  testSVDWithoutPreconditionning<Eigen::Vector3d>("/scan3d.txt", transformation3d);
 }
 
 //-----------------------------------------------------------------------------
 TEST(TestTransform, FindBySVDWithoutPreconditionningh)
 {
-  testWithoutPreconditionning<romea::core::FindRigidTransformationByLeastSquares,
-    romea::core::HomogeneousCoordinates2d>(
+  testSVDWithoutPreconditionning<romea::core::HomogeneousCoordinates2d>(
     "/scan2d.txt", transformation2d);
-  testWithoutPreconditionning<romea::core::FindRigidTransformationByLeastSquares,
-    romea::core::HomogeneousCoordinates3d>(
+  testSVDWithoutPreconditionning<romea::core::HomogeneousCoordinates3d>(
     "/scan3d.txt", transformation3d);
 }
 
@@ -160,22 +179,47 @@ TEST(TestTransform, FindByLeastSquaresWithPreconditionningh)
 }
 
 //-----------------------------------------------------------------------------
+template<class PointType>
+void testSVDWithPreconditionning(
+  const std::string & scanFileName,
+  const Eigen::Transform<typename PointType::Scalar,
+  romea::core::PointTraits<PointType>::DIM, Eigen::Affine> & transformation)
+{
+  romea::core::PointSet<PointType> sourcePoints = loadScan<PointType>(scanFileName);
+  romea::core::PointSet<PointType> targetPoints = projectScan(sourcePoints, transformation);
+  std::vector<romea::core::Correspondence> correspondences =
+    fakeCorrespondences(sourcePoints.size());
+
+  romea::core::PointSetPreconditioner<PointType> targetPointsPreconditioner(targetPoints);
+  romea::core::PreconditionedPointSet<PointType> preconditionedSourcePoints(
+    sourcePoints, targetPointsPreconditioner.getScale());
+  romea::core::PreconditionedPointSet<PointType> preconditionedTargetPoints(
+    targetPoints, targetPointsPreconditioner.getScale());
+
+  romea::core::FindRigidTransformationBySVD<PointType> estimator;
+  auto estimatedTransformation = estimator.find(
+    preconditionedSourcePoints,
+    preconditionedTargetPoints,
+    correspondences);
+
+  EXPECT_NEAR(
+    romea::core::PointTraits<PointType>::DIM + 1,
+    (transformation.matrix().inverse() * estimatedTransformation).array().sum(), 0.01);
+}
+
+//-----------------------------------------------------------------------------
 TEST(TestTransform, FindBySVDWithPreconditionningc)
 {
-  testWithPreconditionning<romea::core::FindRigidTransformationByLeastSquares, Eigen::Vector2d>(
-    "/scan2d.txt", transformation2d);
-  testWithPreconditionning<romea::core::FindRigidTransformationByLeastSquares, Eigen::Vector3d>(
-    "/scan3d.txt", transformation3d);
+  testSVDWithPreconditionning<Eigen::Vector2d>("/scan2d.txt", transformation2d);
+  testSVDWithPreconditionning<Eigen::Vector3d>("/scan3d.txt", transformation3d);
 }
 
 //-----------------------------------------------------------------------------
 TEST(TestTransform, FindBySVDWithPreconditionningh)
 {
-  testWithPreconditionning<romea::core::FindRigidTransformationByLeastSquares,
-    romea::core::HomogeneousCoordinates2d>(
+  testSVDWithPreconditionning<romea::core::HomogeneousCoordinates2d>(
     "/scan2d.txt", transformation2d);
-  testWithPreconditionning<romea::core::FindRigidTransformationByLeastSquares,
-    romea::core::HomogeneousCoordinates3d>(
+  testSVDWithPreconditionning<romea::core::HomogeneousCoordinates3d>(
     "/scan3d.txt", transformation3d);
 }
 

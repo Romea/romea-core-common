@@ -64,16 +64,16 @@ Position3D toPosition3D(const Pose3D & pose3d)
 }
 
 //--------------------------------------------------------------------------
-Pose3D operator*(const Eigen::Affine3d & affine, const Pose3D & pose3D)
+Pose3D operator*(const Eigen::Isometry3d & isometry, const Pose3D & pose3D)
 {
   SmartRotation3D smartRotation(pose3D.orientation);
 
-  Eigen::Matrix3d R = affine.rotation();
-  Eigen::Vector3d T = affine.translation();
-  Eigen::Matrix3d rotation = affine.rotation() * smartRotation.R();
+  Eigen::Matrix3d R = isometry.rotation();
+  Eigen::Vector3d T = isometry.translation();
+  Eigen::Matrix3d rotation = isometry.rotation() * smartRotation.R();
 
   Eigen::Matrix6d J = Eigen::Matrix6d::Zero();
-  J.block<3, 3>(0, 0) = rotation;
+  J.block<3, 3>(0, 0) = R;
 
   // derivative of rotation wrt angle around X = atan(r21/r22)
   double r21 = rotation(2, 1);
@@ -93,23 +93,23 @@ Pose3D operator*(const Eigen::Affine3d & affine, const Pose3D & pose3D)
 
   // derivative of rotation wrt angle around Y = - asin(r20)
   double r20 = rotation(2, 0);
-  double a20 = 1. / (1 - r20 * r20);
+  double a20 = -1. / std::sqrt(1 - r20 * r20);
   J(4, 3) = R.row(2).dot(a20 * smartRotation.dRdAngleAroundXAxis().col(0));
   J(4, 4) = R.row(2).dot(a20 * smartRotation.dRdAngleAroundYAxis().col(0));
   J(4, 5) = R.row(2).dot(a20 * smartRotation.dRdAngleAroundZAxis().col(0));
 
 
   // derivative of rotation wrt angle around Z = atan(r10/r00)
-  double r10 = R(1, 0);
-  double r00 = R(0, 0);
+  double r10 = rotation(1, 0);
+  double r00 = rotation(0, 0);
   double a10 = r00 / (r00 * r00 + r10 * r10);
   double a00 = r10 / (r00 * r00 + r10 * r10);
 
-  J(5, 3) = (-a00 * rotation.row(0) + a10 * rotation.row(1)).dot(
-    smartRotation.dRdAngleAroundYAxis().col(0));
-  J(5, 4) = (-a00 * rotation.row(0) + a10 * rotation.row(1)).dot(
+  J(5, 3) = (-a00 * R.row(0) + a10 * R.row(1)).dot(
     smartRotation.dRdAngleAroundXAxis().col(0));
-  J(5, 5) = (-a00 * rotation.row(0) + a10 * rotation.row(1)).dot(
+  J(5, 4) = (-a00 * R.row(0) + a10 * R.row(1)).dot(
+    smartRotation.dRdAngleAroundYAxis().col(0));
+  J(5, 5) = (-a00 * R.row(0) + a10 * R.row(1)).dot(
     smartRotation.dRdAngleAroundZAxis().col(0));
 
   Pose3D result;
