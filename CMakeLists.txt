@@ -2,22 +2,22 @@ cmake_minimum_required(VERSION 3.5)
 
 project(
   "romea_core_common"
-  VERSION 0.1.0
+  VERSION 1.0.0
   #  DESCRIPTION
   #  HOMEPAGE_URL
   LANGUAGES CXX)
 
-
-#find_package( PkgConfig )
-#pkg_check_modules( EIGEN3 REQUIRED eigen3 )
+include(GNUInstallDirs)
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
 
 add_library(${PROJECT_NAME} SHARED
   src/containers/grid/GridIndexMapping.cpp
   src/containers/grid/RayTracing.cpp
   src/containers/boundingbox/AxisAlignedBoundingBox.cpp
   src/containers/boundingbox/OrientedBoundingBox.cpp
+  # src/control/Joints.cpp
   src/control/PID.cpp
   src/control/PIDFeedForward.cpp
   src/diagnostics/CheckupRate.cpp
@@ -73,10 +73,13 @@ target_include_directories( ${PROJECT_NAME} PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
-target_include_directories( ${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIRS})
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -O3 -std=c++17)
+# target_include_directories( ${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIRS})
+# target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -O3 -std=c++17)
 
-include(GNUInstallDirs)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -O3 -Wno-array-bounds)
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
+
 
 install(
   TARGETS ${PROJECT_NAME}
@@ -109,14 +112,15 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
   "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
 
+install(FILES "${PROJECT_SOURCE_DIR}/cmake/romea_add_gtest.cmake"
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 
-option(BUILD_TESTING "BUILD WITH TESTS" ON)
-
+include(CTest)
 if(BUILD_TESTING)
-  enable_testing()
   add_subdirectory(test)
-endif(BUILD_TESTING)
+endif()
