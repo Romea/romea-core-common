@@ -29,7 +29,8 @@ namespace core
 ENUConverter::ENUConverter()
 : ecefConverter_(),
   wgs84Anchor_(),
-  enu2ecef_(Eigen::Affine3d::Identity()),
+  enu2ecef_(Eigen::Isometry3d::Identity()),
+  enu2ecefAffine_(Eigen::Affine3d::Identity()),
   isAnchored_(false)
 {
 }
@@ -72,6 +73,7 @@ void ENUConverter::setAnchor(const GeodeticCoordinates & anchor)
   enu2ecef_.linear().col(2) << std::cos(latitude) * std::cos(longitude), std::cos(latitude) * sin(
     longitude), sin(latitude);
 
+  enu2ecefAffine_ = enu2ecef_;
   isAnchored_ = true;
 }
 
@@ -85,9 +87,9 @@ Eigen::Vector3d ENUConverter::toECEF(const Eigen::Vector3d & enuPosition)const
 
 
 //--------------------------------------------------------------------------
-Eigen::Vector3d ENUConverter::toECEF(double xNorth, double yEast, double zDown) const
+Eigen::Vector3d ENUConverter::toECEF(double xEast, double yNorth, double zUp) const
 {
-  return toECEF((Eigen::Vector3d() << xNorth, yEast, zDown).finished());
+  return toECEF((Eigen::Vector3d() << xEast, yNorth, zUp).finished());
 }
 
 
@@ -98,9 +100,9 @@ GeodeticCoordinates ENUConverter::toWGS84(const Eigen::Vector3d & enuPosition)co
 }
 
 //--------------------------------------------------------------------------
-GeodeticCoordinates ENUConverter::toWGS84(double xNorth, double yEast, double zDown)const
+GeodeticCoordinates ENUConverter::toWGS84(double xEast, double yNorth, double zUp)const
 {
-  return toWGS84((Eigen::Vector3d() << xNorth, yEast, zDown).finished());
+  return toWGS84((Eigen::Vector3d() << xEast, yNorth, zUp).finished());
 }
 
 //--------------------------------------------------------------------------
@@ -128,15 +130,22 @@ Eigen::Vector3d ENUConverter::toENU(const WGS84Coordinates & wgs84Coordinates)
 }
 
 //--------------------------------------------------------------------------
-const Eigen::Affine3d & ENUConverter::getEnuToEcefTransform() const
+const Eigen::Isometry3d & ENUConverter::getEnuToEcefIsometryTransform() const
 {
   return enu2ecef_;
 }
 
 //--------------------------------------------------------------------------
+const Eigen::Affine3d & ENUConverter::getEnuToEcefTransform() const
+{
+  return enu2ecefAffine_;
+}
+
+//--------------------------------------------------------------------------
 void ENUConverter::reset()
 {
-  enu2ecef_ = Eigen::Affine3d::Identity();
+  enu2ecef_ = Eigen::Isometry3d::Identity();
+  enu2ecefAffine_ = Eigen::Affine3d::Identity();
   isAnchored_ = false;
 }
 

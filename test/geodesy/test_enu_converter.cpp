@@ -44,6 +44,40 @@ TEST(testENUConverter, checkConversions)
 }
 
 //-----------------------------------------------------------------------------
+TEST(testENUConverter, checkAnchorState)
+{
+  auto llh = romea::core::makeGeodeticCoordinates(-37 / 180. * M_PI, 144.96 / 180. * M_PI, 10);
+
+  romea::core::ENUConverter enuConverter;
+  EXPECT_FALSE(enuConverter.isAnchored());
+
+  enuConverter.setAnchor(llh);
+  EXPECT_TRUE(enuConverter.isAnchored());
+  EXPECT_DOUBLE_EQ(enuConverter.getAnchor().latitude, llh.latitude);
+  EXPECT_DOUBLE_EQ(enuConverter.getAnchor().longitude, llh.longitude);
+  EXPECT_DOUBLE_EQ(enuConverter.getAnchor().altitude, llh.altitude);
+
+  enuConverter.reset();
+  EXPECT_FALSE(enuConverter.isAnchored());
+  EXPECT_TRUE(
+    enuConverter.getEnuToEcefIsometryTransform().isApprox(Eigen::Isometry3d::Identity(), 1e-12));
+}
+
+//-----------------------------------------------------------------------------
+TEST(testENUConverter, checkLazyAnchor)
+{
+  auto llh = romea::core::makeGeodeticCoordinates(-37 / 180. * M_PI, 144.96 / 180. * M_PI, 10);
+
+  romea::core::ENUConverter enuConverter;
+  EXPECT_FALSE(enuConverter.isAnchored());
+
+  Eigen::Vector3d enu = enuConverter.toENU(llh);
+
+  EXPECT_TRUE(enuConverter.isAnchored());
+  EXPECT_NEAR(enu.norm(), 0, 1e-6);
+}
+
+//-----------------------------------------------------------------------------
 TEST(testENUConverter, checkConversionPrecision)
 {
   auto llh1 = romea::core::makeGeodeticCoordinates(45.7800 / 180 * M_PI, 3.0800 / 180 * M_PI, 365);

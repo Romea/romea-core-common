@@ -48,11 +48,11 @@ public:
 public:
   GeodeticCoordinates toWGS84(const Eigen::Vector3d & enuPosition)const;
 
-  GeodeticCoordinates toWGS84(double xNorth, double yEast, double zDown) const;
+  GeodeticCoordinates toWGS84(double xEast, double yNorth, double zUp) const;
 
   Eigen::Vector3d toECEF(const Eigen::Vector3d & enuPosition)const;
 
-  Eigen::Vector3d toECEF(double xNorth, double yEast, double zDown) const;
+  Eigen::Vector3d toECEF(double xEast, double yNorth, double zUp) const;
 
   Eigen::Vector3d toENU(const GeodeticCoordinates & geodeticCoordinates);
 
@@ -60,12 +60,16 @@ public:
 
   Eigen::Vector3d toENU(const Eigen::Vector3d & ecefCoordinates)const;
 
+  const Eigen::Isometry3d & getEnuToEcefIsometryTransform()const;
+
+  [[deprecated("Use getEnuToEcefIsometryTransform() instead.")]]
   const Eigen::Affine3d & getEnuToEcefTransform()const;
 
 private:
   ECEFConverter ecefConverter_;
   GeodeticCoordinates wgs84Anchor_;
-  Eigen::Affine3d enu2ecef_;
+  Eigen::Isometry3d enu2ecef_;
+  Eigen::Affine3d enu2ecefAffine_;
 
   bool isAnchored_;
 };

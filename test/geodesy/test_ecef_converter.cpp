@@ -36,7 +36,7 @@ inline void checkConversions(
 }
 
 //-----------------------------------------------------------------------------
-TEST(testECEFConverter, checkConvertionAtClermont)
+TEST(testECEFConverter, checkConversionAtClermont)
 {
   auto llh = romea::core::makeGeodeticCoordinates(45.78 / 180 * M_PI, 3.08 / 180 * M_PI, 365);
   Eigen::Vector3d ecef(4449694.95, 239429.10, 4548489.04);
@@ -44,7 +44,7 @@ TEST(testECEFConverter, checkConvertionAtClermont)
 }
 
 //-----------------------------------------------------------------------------
-TEST(testECEFConverter, checkConvertionAtMelbourne)
+TEST(testECEFConverter, checkConversionAtMelbourne)
 {
   auto llh = romea::core::makeGeodeticCoordinates(-37 / 180. * M_PI, 144.96 / 180. * M_PI, 10.);
   Eigen::Vector3d ecef(-4175633.10, 2928156.31, -3817399.17);
@@ -52,7 +52,7 @@ TEST(testECEFConverter, checkConvertionAtMelbourne)
 }
 
 //-----------------------------------------------------------------------------
-TEST(testECEFConverter, checkConvertionAtAnchorage)
+TEST(testECEFConverter, checkConversionAtAnchorage)
 {
   auto llh = romea::core::makeGeodeticCoordinates(61.17 / 180 * M_PI, -150.02 / 180 * M_PI, 31.);
   Eigen::Vector3d ecef(-2670982.26, -1540849.44, 5564529.01);

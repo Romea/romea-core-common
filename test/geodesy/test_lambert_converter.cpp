@@ -20,7 +20,7 @@
 #include "romea_core_common/geodesy/LambertConverter.hpp"
 
 //-----------------------------------------------------------------------------
-TEST(testLambertConverter, comptureIsometricLatitude)
+TEST(testLambertConverter, computeIsometricLatitude)
 {
   double e = 0.08199188998;
   double eps = 1e-11;
@@ -53,7 +53,7 @@ TEST(testLambertConverter, Latitude)
 }
 
 //-----------------------------------------------------------------------------
-TEST(testLambertConverter, comptureGrandNormal)
+TEST(testLambertConverter, computeGrandNormal)
 {
   double a = 6378388;
   double e = 0.081991890;
