@@ -3,8 +3,10 @@ configure_file(test_helper.h.in test_helper.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 find_package(GTest REQUIRED)
+include(${PROJECT_SOURCE_DIR}/cmake/romea_add_gtest.cmake)
 
 add_subdirectory(containers)
+# add_subdirectory(control)
 add_subdirectory(math)
 add_subdirectory(geodesy)
 add_subdirectory(geometry)
@@ -15,17 +17,8 @@ add_subdirectory(diagnostics)
 add_subdirectory(lexical)
 
 
-add_executable(${PROJECT_NAME}_test_time test_time.cpp )
-target_link_libraries(${PROJECT_NAME}_test_time ${PROJECT_NAME} GTest::GTest GTest::Main)
-target_compile_options(${PROJECT_NAME}_test_time PRIVATE -std=c++17)
-add_test(test_time ${PROJECT_NAME}_test_time)
+romea_add_gtest(test_time test_time.cpp LIBRARIES ${PROJECT_NAME})
 
-add_executable(${PROJECT_NAME}_test_coordinates test_coordinates.cpp )
-target_link_libraries(${PROJECT_NAME}_test_coordinates ${PROJECT_NAME} GTest::GTest GTest::Main)
-target_compile_options(${PROJECT_NAME}_test_coordinates PRIVATE -std=c++17)
-add_test(test_coordinates ${PROJECT_NAME}_test_coordinates)
+romea_add_gtest(test_coordinates test_coordinates.cpp LIBRARIES ${PROJECT_NAME})
 
-add_executable(${PROJECT_NAME}_test_lexical_cast test_lexical_cast.cpp )
-target_link_libraries(${PROJECT_NAME}_test_lexical_cast ${PROJECT_NAME} GTest::GTest GTest::Main)
-target_compile_options(${PROJECT_NAME}_test_lexical_cast PRIVATE -std=c++17)
-add_test(test_lexical_cast ${PROJECT_NAME}_test_lexical_cast)
+romea_add_gtest(test_lexical_cast test_lexical_cast.cpp LIBRARIES ${PROJECT_NAME})

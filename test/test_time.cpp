@@ -20,7 +20,7 @@
 #include "romea_core_common/time/Time.hpp"
 
 //-----------------------------------------------------------------------------
-TEST(TestTime, convertion)
+TEST(TestTime, conversion)
 {
   romea::core::Duration sec(1000000000);
 
