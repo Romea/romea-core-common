@@ -35,6 +35,7 @@ public:
   virtual void addEntry(const std::string & name, int value) = 0;
   virtual void addEntry(const std::string & name, const std::string & value) = 0;
   virtual void writeRow() = 0;
+  virtual void clearRow() = 0;
 };
 
 }  // namespace romea::core
