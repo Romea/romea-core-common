@@ -105,11 +105,13 @@ Infrastructure for robust robotic applications:
 - Runtime diagnostics
 - Health monitoring
 - Logging utilities
+- Finite-state-machine state, event and notification helpers
 - Performance monitoring
 - Debug support
 
 Modules:
 - `diagnostic`
+- `fsm`
 - `monitoring`
 - `log`
 
