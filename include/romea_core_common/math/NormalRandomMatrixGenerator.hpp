@@ -119,7 +119,7 @@ public:
   void fill(ContainerBase<Derived> & matrix)
   {
     std::normal_distribution<double> distribution(mean_, std_);
-    matrix.unaryExpr([&](double /*dummy*/) {return distribution(engine_);});
+    matrix = matrix.unaryExpr([&](double /*dummy*/) {return distribution(engine_);});
   }
 
 private:
